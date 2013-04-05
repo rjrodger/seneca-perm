@@ -28,11 +28,13 @@ describe('perm', function() {
     si.add({a:1,b:2},function(args,done){done(null,''+args.a+args.b+args.c)})
 
 
-    si.use( '..', {pins:[
+    si.use( '..', {act:[
       {a:1,b:2},
       {a:1,b:2,d:4}
     ]})
 
+
+    si.act('role:perm,cmd:init')
 
 
     si.act('a:1,b:2,c:3',function(err,out){
@@ -92,6 +94,9 @@ describe('perm', function() {
       ]
     })
 
+    si.act('role:perm,cmd:init')
+
+
     var entity = si.util.router()
     entity.add({name:'foo'},'cr')
 
@@ -131,6 +136,8 @@ describe('perm', function() {
       ]
     })
 
+    si.act('role:perm,cmd:init')
+
     //console.log(si.actroutes())
 
     var entity = si.util.router()
@@ -163,4 +170,38 @@ describe('perm', function() {
     })
   })
 
+
+  it('makeperm',function(){
+
+    var si = seneca()
+
+    si.use( '..', {
+      act:[
+        {a:1},
+        {b:2}
+      ]
+    })
+
+
+    si.add({a:1},function(args,done){done(null,''+args.a+args.c)})    
+    si.add({b:2},function(args,done){done(null,''+args.b+args.c)})    
+
+    si.act('role:perm,cmd:init')
+
+    si.act('role:perm,cmd:makeperm',{perm:{act:[
+      {a:1,perm$:true}
+    ]}}, function(err,perm){
+      assert.isNull(err)
+
+      si.act('a:1,c:3',{perm$:perm},function(err,out){
+        assert.isNull(err)
+        assert.equal('13',out)
+      })
+
+      si.act('b:2,c:3',{perm$:perm},function(err,out){
+        assert.isNotNull(err)
+        assert.equal('perm/fail/act',err.seneca.code)
+      })
+    })
+  })
 })
