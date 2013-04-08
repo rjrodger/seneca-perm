@@ -19,7 +19,7 @@ This plugin also understands when it is used in a web server context, and will a
 the req.seneca object if it exists.
 
 A full example, in the context of the seneca data editor, is provided
-in the [seneca examples repository](https://github.com/rjrodger/seneca-examples).
+in the [seneca examples repository](https://github.com/rjrodger/seneca-examples). TODO!
 
 
 ### Support
@@ -265,7 +265,7 @@ This will converted to the perm$ metadata argument:
 {act:router}
 ```
 
-where _router_ is a [seneca router](http://senecajs.org/routing.html) (the same thing that routes action arguments to plugin functions). 
+where _router_ is a [seneca router](http://senecajs.org/routing.html) TODO! (the same thing that routes action arguments to plugin functions). 
 The router matches a given set of action arguments to the permission specification.
 
 You could construct it manually, like so:
