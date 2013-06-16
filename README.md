@@ -51,7 +51,7 @@ userent.find({email:'alice@example.com'}, function(err,alice){
 ```
 
 This permission specification allows the user alice to execute _foo:bar_ actions, but not _qaz:lol_ ones.
-The perm$ metadata property specifies the permissions for each action pattern in the list.
+The _perm$_ metadata property specifies the permissions for each action pattern in the list.
 
 Here's another example, this time for entities:
 
@@ -154,7 +154,7 @@ checks only occur if there is a _perm$_ metadata argument, containing a permissi
 
 ### Permission options
 
-   * _act_: array of action pins
+   * _act_: array of action pins (needed for both _allow_ and _act_ checks)
    * _entity_: array of entity type specifications
    * _own_: array of entity type specifications
 
@@ -168,7 +168,7 @@ seneca.use( 'perm', {act:[
 
 This wraps any action with a _role:echo_ argument, which means that it will have a permission check applied.
 
-You need to specify explicitly the actions to which you wish to apply permission checks.
+<b>You need to specify explicitly the actions to which you wish to apply permission checks.</b>
 
 As a convenience, you can apply permission checks to entities by simply specifying their zone, base and name (all optional):
 
@@ -209,7 +209,7 @@ seneca.use( 'perm', {own:[
 
 ### Permission specifications
 
-To trigger a permissions check, an action must contain a perm$ metadata argument. This is an object contains one or more of the
+To trigger a permissions check, an action must contain a perm$ metadata argument. This is an object that contains one or more of the
 following properties:
 
    * allow: boolean, true if action is permitted.
@@ -227,7 +227,7 @@ literal definition (you can store this in the -/sys/user entity, for example). I
 To store as a literal, use this structure in the _perm_ property:
 
 ```JavaScript
-    {allow:true|false}
+{allow:true|false}
 ```
 
 This will converted to the perm$ metadata argument, by the _role:perm, cmd:makeperm_ action:
