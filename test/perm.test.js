@@ -144,6 +144,49 @@ describe('perm', function() {
   // TODO: test all ent cmds
 
 
+
+  it('entity-boolean', function(){
+    var si = seneca()
+
+    si.use( '..', {
+      // apply perm check to all entities
+      entity:true
+    })
+
+
+    si.ready(function(err){
+      assert.isNull(err)
+
+
+      var entity = si.util.router()
+      entity.add({name:'bar'},'rq')
+
+      var f1 = si.make('foo',{a:1}).save$()
+      var b1 = si.make('bar',{b:2}).save$()
+
+      var psi = si.delegate({perm$:{entity:entity}})
+
+      var pf1 = psi.make('foo')
+      var pb1 = psi.make('bar')
+
+
+
+      ;pf1.list$({a:1},function(err,list){
+        assert.isNotNull(err)
+        assert.equal(null,err.seneca.allowed)
+        assert.equal('q',err.seneca.was)
+            
+
+      ;pb1.list$({b:2},function(err,list){
+        assert.isNull(err)
+        assert.equal(2,list[0].b)
+        
+      }) })
+
+    })
+  })
+
+
   it('owner', function(){
     var si = seneca()
 
