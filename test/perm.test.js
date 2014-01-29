@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Richard Rodger */
+/* Copyright (c) 2013-2014 Richard Rodger */
 "use strict";
 
 
@@ -128,7 +128,7 @@ describe('perm', function() {
       ;pf1.save$(function(err,pf1){
         assert.isNotNull(err)
         assert.equal('cr',err.seneca.allowed)
-        assert.equal('u',err.seneca.was)
+        assert.equal('u',err.seneca.need)
             
 
       ;pb1.list$({b:2},function(err,list){
@@ -174,7 +174,7 @@ describe('perm', function() {
       ;pf1.list$({a:1},function(err,list){
         assert.isNotNull(err)
         assert.equal(null,err.seneca.allowed)
-        assert.equal('q',err.seneca.was)
+        assert.equal('q',err.seneca.need)
             
 
       ;pb1.list$({b:2},function(err,list){

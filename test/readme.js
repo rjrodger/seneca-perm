@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Richard Rodger */
+/* Copyright (c) 2013-2014 Richard Rodger, MIT License */
 "use strict";
 
 
@@ -10,13 +10,15 @@ seneca.use( '..', {act:[
   {role:'echo'},
 ]})
 
-seneca.act({role:'perm', cmd:'init'})
 
+seneca.ready(function(){
 
-seneca.act({role:'echo', foo:'bar', perm$:{allow:true}},function(err,out){
-  console.log('foo='+out.foo)
-})
+  seneca.act({role:'echo', foo:'bar', perm$:{allow:true}},function(err,out){
+    console.log('foo='+out.foo)
+  })
 
-seneca.act({role:'echo', foo:'bar', perm$:{allow:false}},function(err,out){
-  console.log(err)
+  seneca.act({role:'echo', foo:'bar', perm$:{allow:false}},function(err,out){
+    console.log(err)
+  })
+
 })

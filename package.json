@@ -1,10 +1,10 @@
 {
   "name": "seneca-perm",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Seneca permissions plugin",
-  "main": "lib/perm.js",
+  "main": "perm.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/mocha/bin/mocha test/perm.test.js"
   },
   "repository": {
     "type": "git",
@@ -18,19 +18,23 @@
   ],
   "author": "Richard Rodger (http://richardrodger.com)",
   "license": "MIT",
-  "dependencies": {
-    "underscore": "~1.4.4"
-  },
   "devDependencies": {
-    "gex": "~0.0.3",
-    "chai": "~1.5.0",
-    "async": "~0.2.5",
-    "seneca": ">=0.5.9",
-    "connect": "~2.7.4"
+    "seneca": "0.5.x",
+    "connect": "2.12.x",
+    "mocha": "1.17.x",
+    "gex": "0.1.x",
+    "async": "0.2.x",
+    "chai": "1.8.x"
+  },
+  "dependencies": {
+    "underscore": "1.5.x"
+  },
+  "peerDependencies": {
+    "seneca": "*"
   },
   "files": [
     "README.md",
     "LICENSE.txt",
-    "lib/perm.js"
+    "perm.js"
   ]
 }

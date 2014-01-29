@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Richard Rodger, MIT License */
+/* Copyright (c) 2013-2014 Richard Rodger, MIT License */
 "use strict";
 
 
@@ -12,7 +12,7 @@ var name = "perm"
 
 
 
-// TODO: should be able to dynamically add perms so they can be used form custom plugins
+// TODO: should be able to dynamically add perms so they can be used from custom plugins
 
 
 module.exports = function(options) {
@@ -82,14 +82,14 @@ module.exports = function(options) {
         var opspec = perm.entity.find(args)
 
         var result = allow_ent_op(args,opspec)
-        proceed(result.allow,'entity/operation',{allowed:opspec,was:result.ops},args,prior,done)
+        proceed(result.allow,'entity/operation',{allowed:opspec,need:result.need},args,prior,done)
       }
       else if( perm.own ) {
         var opspec = perm.own.entity.find(args)
         var owner  = perm.own.owner
         var result = allow_ent_op(args,opspec)
         
-        if( !result.allow ) return seneca.fail({code:'perm/fail/own',allowed:opspec,was:result.ops,args:args,status:denied},done);
+        if( !result.allow ) return seneca.fail({code:'perm/fail/own',allowed:opspec,need:result.need,args:args,status:denied},done);
         
         if( 'save' == args.cmd || 'load' == args.cmd || 'remove' == args.cmd ) {
           var ent = args.ent
@@ -142,9 +142,16 @@ module.exports = function(options) {
 
   seneca.add({init:name}, function(args,done){
 
-    _.each(options.act,function( pin ){
-      seneca.add(pin,permcheck)
-    })
+    if( _.isBoolean(options.act) && options.act ) {
+      _.each( seneca.list(), function( act ){
+        seneca.add(act,permcheck)
+      })
+    }
+    else if( _.isArray( options.act ) ) {
+      _.each(options.act,function( pin ){
+        seneca.add(pin,permcheck)
+      })
+    }
 
 
     var cmds = ['save','load','list','remove']
@@ -281,9 +288,13 @@ module.exports = function(options) {
   }
 
 
+  seneca.act({role:'web',use:service})
+
   return {
     name:name,
-    service:service
+    exports:{
+      make:makeperm
+    }
   }
 }
 
