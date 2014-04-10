@@ -133,6 +133,28 @@ module.exports = function(options) {
         var result = allow_ent_op(args,opspec)
         proceed(result.allow,'entity/operation',{allowed:opspec,need:result.need},args,prior,done)
       }
+      else if(perm.roles) {
+
+        var action = getAction(args)
+
+        var entityDef = {
+          zone: args.zone,
+          base: args.base,
+          name: args.name
+        }
+
+        // TODO: findall instead
+        var aclAuthProcedure = entitiesACLs.find(entityDef)
+
+        if(aclAuthProcedure) { // perm.entity is also expected here
+          var roles = perm.roles || []
+          aclAuthProcedure.authorize(args.ent, action, roles, function(err, result) {
+            proceed(!err && result.authorize,'acl',null,args,prior,done)
+          })
+        } else {
+          prior(args,done)
+        }
+      }
       else if( perm.own ) {
         var opspec = perm.own.entity.find(args)
         var owner  = perm.own.owner
@@ -184,23 +206,7 @@ module.exports = function(options) {
     // this allows internal operations to proceed as normal
     else {
 
-      var entity = {
-        zone: args.zone,
-        base: args.base,
-        name: args.name
-      }
-
-      // TODO: findall instead
-      var aclAuthProcedure = entitiesACLs.find(entity)
-
-      if(aclAuthProcedure) { // perm.entity is also expected here
-        var roles = args.login$ ? args.login$.roles : ['EMEA']
-        aclAuthProcedure.authorize(args.ent, 'r', roles, function(err, result) {
-          proceed(!err && result.authorize,'acl',null,args,prior,done)
-        })
-      } else {
-        prior(args,done)
-      }
+      return prior(args,done)
     }
   }
 

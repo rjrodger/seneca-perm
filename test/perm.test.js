@@ -264,17 +264,29 @@ describe('perm', function() {
   })
 
 
-  it('acl', function(){
+  describe('acl', function(){
     var si = seneca()
 
     si.use( '..', {
       accessControls: [{
+        name: 'access to foobar entities',
+        roles: ['foobar'],
         entities: [{
           zone: undefined,
           base: undefined,
           name: 'foobar'
         }],
+        control: 'required',
+        actions: 'crudq',
+        conditions: []
+      },{
+        name: 'access to foobar EMEA entities',
         roles: ['EMEA'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'foobar'
+        }],
         control: 'required',
         actions: 'crud',
         conditions: [{
@@ -286,21 +298,15 @@ describe('perm', function() {
       }]
     })
 
+    it('seneca ready', function(done) {
+      si.ready(done)
+    })
 
-    si.ready(function(err){
-      assert.isNull(err)
+    it('entity level access', function() {
 
+      var psi = si.delegate({perm$:{roles:['foobar']}})
 
-      var b1 = si.make('foobar',{region:'EMEA'}).save$()
-
-      var psi = si.delegate({login$:{roles:['EMEA']}})
-
-      var pf1 = psi.make('foobar',{region:'EMEA'})
-      var pb1 = psi.make('foobar')
-
-      pf1.login$ = {
-        roles: ['EMEA']
-      }
+      var pf1 = psi.make('foobar')
 
       ;pf1.save$(function(err,pf1){
         assert.isNull(err)
@@ -311,14 +317,64 @@ describe('perm', function() {
         assert.isNotNull(pf1.id)
 
         pf1.a=2
+
       ;pf1.save$(function(err,pf1){
         assert.isNull(err)
 
-      ;pb1.list$({b:2},function(err,list){
+      }) }) })
+
+    })
+
+    it('attributes based access', function() {
+
+      var psi = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
+
+      var pf1 = psi.make('foobar',{region:'EMEA'})
+
+      ;pf1.save$(function(err,pf1){
+        assert.isNull(err)
+        assert.isNotNull(pf1.id)
+
+      ;pf1.load$(pf1.id,function(err,pf1){
+        assert.isNull(err)
+        assert.isNotNull(pf1.id)
+
+        pf1.a=2
+
+      ;pf1.save$(function(err,pf1){
         assert.isNull(err)
 
-      }) }) }) })
+      }) }) })
 
+    })
+
+
+    it('attribute based rejection', function() {
+
+      var psi = si.delegate({perm$:{roles:['foobar']}})
+
+      var pf1 = psi.make('foobar',{region:'EMEA'})
+
+      ;pf1.save$(function(err,pf1){
+        assert.isNotNull(err)
+        assert.isNotNull(err.seneca)
+        assert.equal(err.seneca.code, 'perm/fail/acl')
+      })
+
+    })
+
+
+    it('entity level rejection', function() {
+
+      var psi = si.delegate({perm$:{roles:['EMEA']}})
+
+      var pf1 = psi.make('foobar',{region:'EMEA'})
+
+      ;pf1.save$(function(err,pf1){
+        assert.isNotNull(err)
+        assert.isNotNull(err.seneca)
+        assert.equal(err.seneca.code, 'perm/fail/acl')
+      })
     })
 
   })

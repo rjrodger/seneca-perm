@@ -94,5 +94,49 @@ describe('access control list', function() {
 
   })
 
+  it('should always apply on empty conditions', function(done) {
+
+    var obj1 = {region: 'EMEA'}
+    var obj2 = {region: 'APAC'}
+
+    var acl = new AccessControlList({
+      name: 'acl1_required',
+      roles: ['granted'],
+      control: 'required',
+      actions: 'r',
+      conditions: []
+    })
+
+    assert.ok(acl.shouldApply(obj1, 'r'))
+    assert.ok(!acl.shouldApply(obj1, 'w'))
+    assert.ok(!acl.shouldApply(obj1, 'd'))
+
+    assert.ok(acl.shouldApply(obj2, 'r'))
+    assert.ok(!acl.shouldApply(obj2, 'w'))
+    assert.ok(!acl.shouldApply(obj2, 'd'))
+
+    acl.authorize(obj1, 'r', ['granted'], function(err, result) {
+
+      assert.ok(!err, err)
+
+      console.log(result)
+      assert.ok(result)
+      assert.ok(result.authorize)
+
+      acl.authorize(obj2, 'r', ['denied'], function(err, result) {
+
+        assert.ok(!err, err)
+
+        assert.ok(result)
+        assert.ok(!result.authorize)
+
+        done()
+
+      })
+    })
+
+
+  })
+
 
 })
