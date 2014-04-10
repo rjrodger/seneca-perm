@@ -112,12 +112,14 @@ module.exports = function(options) {
 
 
   function permcheck(args,done) {
+
     var prior = this.prior
     if( !prior ) {
       return seneca.fail({code:'perm/no-prior',args:args},done)
     }
 
     var perm = args.perm$
+    console.log('PERM CHECK', perm)
 
     if( perm ) {
       if( _.isBoolean(perm.allow) ) {
@@ -281,7 +283,7 @@ module.exports = function(options) {
 
     function make_router(permspec,name) {
       var router = seneca.util.router()
-      console.log(permspec, name)
+
       var pinspec = permspec[name]
       if( _.isArray(pinspec) ) {
         _.each(pinspec,function(entry){
@@ -308,6 +310,11 @@ module.exports = function(options) {
     }
     if( permspec.entity ) {
       make_router(permspec,'entity')
+    }
+    if( permspec.roles ) {
+//       var router = seneca.util.router()
+//       router.add( seneca.util.parsecanon('-/-/-'), 'crudq' )
+//       perm.roles = permspec.roles
     }
     if( permspec.own ) {
       make_router(permspec,'own')
@@ -348,6 +355,7 @@ module.exports = function(options) {
         else {
           user.perm = {}
         }
+        console.log('user', user, JSON.stringify(perm))
 
         user.perm.owner = user.id
         res.seneca = req.seneca = req.seneca.delegate({perm$:perm})
