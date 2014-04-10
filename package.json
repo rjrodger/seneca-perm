@@ -4,7 +4,7 @@
   "description": "Seneca permissions plugin",
   "main": "perm.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test/perm.test.js"
+    "test": "./node_modules/mocha/bin/mocha test/*.test.js --reporter spec"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,8 @@
     "chai": "1.8.x"
   },
   "dependencies": {
-    "underscore": "1.5.x"
+    "underscore": "1.5.x",
+    "patrun": "0.1.5"
   },
   "peerDependencies": {
     "seneca": "*"

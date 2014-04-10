@@ -13,14 +13,8 @@ var gex     = require('gex')
 var async   = require('async')
 
 
-
-
-
-
-
-
 describe('perm', function() {
-  
+
 
   it('allow', function(){
     var si = seneca()
@@ -129,12 +123,12 @@ describe('perm', function() {
         assert.isNotNull(err)
         assert.equal('cr',err.seneca.allowed)
         assert.equal('u',err.seneca.need)
-            
+
 
       ;pb1.list$({b:2},function(err,list){
         assert.isNull(err)
         assert.equal(2,list[0].b)
-        
+
       }) }) }) })
 
     })
@@ -175,12 +169,12 @@ describe('perm', function() {
         assert.isNotNull(err)
         assert.equal(null,err.seneca.allowed)
         assert.equal('q',err.seneca.need)
-            
+
 
       ;pb1.list$({b:2},function(err,list){
         assert.isNull(err)
         assert.equal(2,list[0].b)
-        
+
       }) })
 
     })
@@ -226,7 +220,7 @@ describe('perm', function() {
             assert.equal('perm/fail/own',err.seneca.code)
             assert.equal('o2',err.seneca.owner)
             //console.log(err)
-          })      
+          })
         })
       })
     })
@@ -245,8 +239,8 @@ describe('perm', function() {
     })
 
 
-    si.add({a:1},function(args,done){done(null,''+args.a+args.c)})    
-    si.add({b:2},function(args,done){done(null,''+args.b+args.c)})    
+    si.add({a:1},function(args,done){done(null,''+args.a+args.c)})
+    si.add({b:2},function(args,done){done(null,''+args.b+args.c)})
 
 
     si.ready(function(err){
@@ -267,5 +261,65 @@ describe('perm', function() {
         })
       })
     })
+  })
+
+
+  it('acl', function(){
+    var si = seneca()
+
+    si.use( '..', {
+      accessControls: [{
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'foobar'
+        }],
+        roles: ['EMEA'],
+        control: 'required',
+        actions: 'crud',
+        conditions: [{
+            attributes: {
+              'region': 'EMEA'
+            }
+          }
+        ]
+      }]
+    })
+
+
+    si.ready(function(err){
+      assert.isNull(err)
+
+
+      var b1 = si.make('foobar',{region:'EMEA'}).save$()
+
+      var psi = si.delegate({login$:{roles:['EMEA']}})
+
+      var pf1 = psi.make('foobar',{region:'EMEA'})
+      var pb1 = psi.make('foobar')
+
+      pf1.login$ = {
+        roles: ['EMEA']
+      }
+
+      ;pf1.save$(function(err,pf1){
+        assert.isNull(err)
+        assert.isNotNull(pf1.id)
+
+      ;pf1.load$(pf1.id,function(err,pf1){
+        assert.isNull(err)
+        assert.isNotNull(pf1.id)
+
+        pf1.a=2
+      ;pf1.save$(function(err,pf1){
+        assert.isNull(err)
+
+      ;pb1.list$({b:2},function(err,list){
+        assert.isNull(err)
+
+      }) }) }) })
+
+    })
+
   })
 })

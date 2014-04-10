@@ -3,10 +3,11 @@
 
 
 var util = require('util')
-
+var patrun = require('patrun')
 
 var _ = require('underscore')
 
+var AccessControlProcedure = require('./lib/AccessControlProcedure.js')
 
 var name = "perm"
 
@@ -25,6 +26,55 @@ module.exports = function(options) {
     anon:{}
   },options)
 
+  var entitiesACLs = patrun()
+
+  function buildACLs() {
+
+    if(options.accessControls) {
+
+      for(var i = 0 ; i < options.accessControls.length ; i++) {
+        var acl = options.accessControls[i]
+        for(var j = 0 ; j < acl.entities.length ; j++) {
+          var entity = acl.entities[j]
+
+          // TODO: do not just push, merge
+          if(!options.entity) {
+            options.entity = true
+          } else {
+            options.entity.push((entity.zone||'-') +'/' + (entity.base||'-') + '/' +  entity.name)
+          }
+
+          var aclProcedure = entitiesACLs.find(entity)
+
+          if(!aclProcedure) {
+            aclProcedure = new AccessControlProcedure()
+          }
+          aclProcedure.addAccessControls(acl)
+
+          entitiesACLs.add(acl.entities[j], aclProcedure)
+        }
+
+      }
+    }
+  }
+
+  function getAction(args) {
+    var action
+    switch(args.cmd) {
+      case "save":
+        action = args.ent.id ? 'u' : 'c'
+        break
+      case "delete":
+        action = 'd'
+        break;
+      case "load":
+      case "list":
+        action = 'r'
+        break;
+    }
+    return action
+  }
+
 
   var denied = options.status.denied
 
@@ -32,7 +82,6 @@ module.exports = function(options) {
     if( !allow ) return seneca.fail(_.extend({},meta||{},{code:'perm/fail/'+type,args:args,status:denied}),done);
     parent(args,done)
   }
-
 
   function allow_ent_op(args,opspec) {
     opspec = void 0 == opspec ? '' : opspec
@@ -50,7 +99,7 @@ module.exports = function(options) {
     else if( 'list'==args.cmd ) {
       ops = 'q'
     }
-    
+
     var allow = '*' == opspec
     if( !allow ) {
       _.each(ops.split(''),function(op){
@@ -88,9 +137,9 @@ module.exports = function(options) {
         var opspec = perm.own.entity.find(args)
         var owner  = perm.own.owner
         var result = allow_ent_op(args,opspec)
-        
+
         if( !result.allow ) return seneca.fail({code:'perm/fail/own',allowed:opspec,need:result.need,args:args,status:denied},done);
-        
+
         if( 'save' == args.cmd || 'load' == args.cmd || 'remove' == args.cmd ) {
           var ent = args.ent
           var id = 'load'==args.cmd ? (args.q && args.q.id) : ent.id
@@ -134,13 +183,31 @@ module.exports = function(options) {
     // need an explicit perm$ arg to trigger a permcheck
     // this allows internal operations to proceed as normal
     else {
-      return prior(args,done)
+
+      var entity = {
+        zone: args.zone,
+        base: args.base,
+        name: args.name
+      }
+
+      // TODO: findall instead
+      var aclAuthProcedure = entitiesACLs.find(entity)
+
+      if(aclAuthProcedure) { // perm.entity is also expected here
+        var roles = args.login$ ? args.login$.roles : ['EMEA']
+        aclAuthProcedure.authorize(args.ent, 'r', roles, function(err, result) {
+          proceed(!err && result.authorize,'acl',null,args,prior,done)
+        })
+      } else {
+        prior(args,done)
+      }
     }
   }
 
 
 
   seneca.add({init:name}, function(args,done){
+
 
     if( _.isBoolean(options.act) && options.act ) {
       _.each( seneca.list(), function( act ){
@@ -158,11 +225,13 @@ module.exports = function(options) {
 
     options.entity = _.isBoolean(options.entity) ? (options.entity ? ['-/-/-'] : []) : (options.entity || [])
 
+    buildACLs()
+
     _.each(options.entity,function( entspec ){
       _.each(cmds,function(cmd){
         entspec = _.isString(entspec) ? seneca.util.parsecanon(entspec) : entspec
         var spec = _.extend({role:'entity',cmd:cmd},entspec)
-        seneca.add(spec,permcheck)    
+        seneca.add(spec,permcheck)
       })
     })
 
@@ -173,7 +242,7 @@ module.exports = function(options) {
       _.each(cmds,function(cmd){
         entspec = _.isString(entspec) ? seneca.util.parsecanon(entspec) : entspec
         var spec = _.extend({role:'entity',cmd:cmd},entspec)
-        seneca.add(spec,permcheck)    
+        seneca.add(spec,permcheck)
       })
     })
 
@@ -206,7 +275,7 @@ module.exports = function(options) {
 
     function make_router(permspec,name) {
       var router = seneca.util.router()
-
+      console.log(permspec, name)
       var pinspec = permspec[name]
       if( _.isArray(pinspec) ) {
         _.each(pinspec,function(entry){
@@ -245,7 +314,7 @@ module.exports = function(options) {
 
     return perm
   }
-  
+
 
   var nilperm = makeperm({})
   var anonperm = makeperm(options.anon)
@@ -289,6 +358,7 @@ module.exports = function(options) {
 
 
   seneca.act({role:'web',use:service})
+
 
   return {
     name:name,
