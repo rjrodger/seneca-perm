@@ -12,7 +12,6 @@ var AccessControlProcedure = require('./lib/AccessControlProcedure.js')
 var name = "perm"
 
 
-
 // TODO: should be able to dynamically add perms so they can be used from custom plugins
 
 
