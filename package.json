@@ -33,10 +33,5 @@
   },
   "peerDependencies": {
     "seneca": "*"
-  },
-  "files": [
-    "README.md",
-    "LICENSE.txt",
-    "perm.js"
-  ]
+  }
 }
