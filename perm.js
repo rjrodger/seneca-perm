@@ -194,6 +194,11 @@ module.exports = function(options) {
 
         if(aclAuthProcedure) {
 
+          // TODO: currently there is a security hole for the update case.
+          //       if a user manages to get the id of an entity he should not have access to,
+          //       he can do an 'update' on this entity and the update will work.
+          //       To prevent that, we need to first read an entity before it is actually updated
+
           if(action === 'r') { // for list and load action, filter/authorize after calling the 'prior' function to check obj attributes
             prior(args, function(err, result) {
               if(err) {
