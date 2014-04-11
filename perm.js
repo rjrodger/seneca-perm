@@ -119,8 +119,9 @@ module.exports = function(options) {
     }
 
     var perm = args.perm$
-    console.log('PERM CHECK', perm)
 
+    // TODO: all permissions should be checked to reach a consensus:
+    //         either all checks grant permission or one of them denies it
     if( perm ) {
       if( _.isBoolean(perm.allow) ) {
         proceed(perm.allow,'allow',null,args,prior,done)
@@ -128,12 +129,6 @@ module.exports = function(options) {
       else if( perm.act ) {
         var allow = !!perm.act.find(args)
         proceed(allow,'act',null,args,prior,done)
-      }
-      else if( perm.entity ) {
-        var opspec = perm.entity.find(args)
-
-        var result = allow_ent_op(args,opspec)
-        proceed(result.allow,'entity/operation',{allowed:opspec,need:result.need},args,prior,done)
       }
       else if(perm.roles) {
 
@@ -148,14 +143,19 @@ module.exports = function(options) {
         // TODO: findall instead
         var aclAuthProcedure = entitiesACLs.find(entityDef)
 
-        if(aclAuthProcedure) { // perm.entity is also expected here
-          var roles = perm.roles || []
-          aclAuthProcedure.authorize(args.ent, action, roles, function(err, result) {
-            proceed(!err && result.authorize,'acl',null,args,prior,done)
+        if(aclAuthProcedure) {
+          aclAuthProcedure.authorize(args.ent, action, perm.roles, function(err, result) {
+            proceed(!err && result.authorize, 'acl', null, args, prior, done)
           })
         } else {
-          prior(args,done)
+          prior(args, done)
         }
+      }
+      else if( perm.entity ) {
+        var opspec = perm.entity.find(args)
+
+        var result = allow_ent_op(args,opspec)
+        proceed(result.allow,'entity/operation',{allowed:opspec,need:result.need},args,prior,done)
       }
       else if( perm.own ) {
         var opspec = perm.own.entity.find(args)
@@ -314,7 +314,8 @@ module.exports = function(options) {
     if( permspec.roles ) {
 //       var router = seneca.util.router()
 //       router.add( seneca.util.parsecanon('-/-/-'), 'crudq' )
-//       perm.roles = permspec.roles
+//       perm.roles = router
+      perm.roles = permspec.roles
     }
     if( permspec.own ) {
       make_router(permspec,'own')
@@ -355,8 +356,6 @@ module.exports = function(options) {
         else {
           user.perm = {}
         }
-        console.log('user', user, JSON.stringify(perm))
-
         user.perm.owner = user.id
         res.seneca = req.seneca = req.seneca.delegate({perm$:perm})
         req.seneca.user = user

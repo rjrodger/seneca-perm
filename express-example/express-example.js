@@ -64,7 +64,7 @@ seneca.ready(function(err){
   var u = seneca.pin({role:'user',cmd:'*'})
   var projectpin = seneca.pin({role:'project',cmd:'*'})
 
-  u.register({nick:'u1',name:'u1',email:'u1@example.com',password:'1',perm: {entity: [{base:'sys', name:'project', perm$: 'r'}], roles: ['']}, active:true}, function(err,out){
+  u.register({nick:'u1',name:'u1',email:'u1@example.com',password:'1',perm: {entity: [{base:'sys', name:'project', perm$: 'r'}], roles: ['foobar']}, active:true}, function(err,out){
     projectpin.save( {account:out.user.accounts[0], name:'p1-denied', category: 'denied'} )
     projectpin.save( {account:out.user.accounts[0], name:'p1-granted', category: 'granted'} )
   })
