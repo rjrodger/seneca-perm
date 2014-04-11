@@ -9,7 +9,11 @@ describe('access control list', function() {
 
   it('single attribute single role', function(done) {
 
-    var obj = {region: 'EMEA'}
+    var obj = {
+      nested: {
+        region: 'EMEA'
+      }
+    }
 
     var acl = new AccessControlList({
       name: 'acl1_required',
@@ -18,7 +22,7 @@ describe('access control list', function() {
       actions: 'rw',
       conditions: [{
           attributes: {
-            'region': 'EMEA'
+            'nested.region': 'EMEA'
           }
         }
       ]

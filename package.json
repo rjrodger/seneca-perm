@@ -28,7 +28,8 @@
   },
   "dependencies": {
     "underscore": "1.5.x",
-    "patrun": "0.1.5"
+    "patrun": "0.1.5",
+    "object-tree": "0.2.1"
   },
   "peerDependencies": {
     "seneca": "*"
