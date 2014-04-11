@@ -34,18 +34,18 @@ seneca.use('../perm.js', {
     actions: 'crudq',
     conditions: []
   },{
-    name: 'access to foobar EMEA entities',
-    roles: ['EMEA'],
+    name: 'access to secret projects',
+    roles: ['secret'],
     entities: [{
       zone: undefined,
       base: undefined,
       name: 'project'
     }],
     control: 'required',
-    actions: 'crud',
+    actions: 'crudq',
     conditions: [{
         attributes: {
-          'region': 'EMEA'
+          'category': 'secret'
         }
       }
     ]
@@ -64,11 +64,18 @@ seneca.ready(function(err){
   var u = seneca.pin({role:'user',cmd:'*'})
   var projectpin = seneca.pin({role:'project',cmd:'*'})
 
-  u.register({nick:'u1',name:'u1',email:'u1@example.com',password:'1',perm: {entity: [{base:'sys', name:'project', perm$: 'r'}], roles: ['foobar']}, active:true}, function(err,out){
-    projectpin.save( {account:out.user.accounts[0], name:'p1-denied', category: 'denied'} )
-    projectpin.save( {account:out.user.accounts[0], name:'p1-granted', category: 'granted'} )
+  u.register({nick:'u1',name:'u1',email:'u1@example.com',password:'1',perm: {roles: ['project_access', 'secret']}, active:true}, function(err,out){
+    projectpin.save( {account:out.user.accounts[0], name:'public project', category: 'public'} )
+    projectpin.save( {account:out.user.accounts[0], name:'secret project', category: 'secret'} )
   })
-  u.register({nick:'u2',name:'nu2',email:'u2@example.com',password:'u2',active:true})
+  u.register({nick:'u2',name:'u2',email:'u2@example.com',password:'1',perm: {roles: ['project_access']}, active:true}, function(err,out){
+    projectpin.save( {account:out.user.accounts[0], name:'public project', category: 'public'} )
+    projectpin.save( {account:out.user.accounts[0], name:'secret project that you should not see', category: 'secret'} )
+  })
+  u.register({nick:'u3',name:'u3',email:'u3@example.com',password:'1',perm: {roles: []}, active:true}, function(err,out){
+    projectpin.save( {account:out.user.accounts[0], name:'public project that you should not see', category: 'public'} )
+    projectpin.save( {account:out.user.accounts[0], name:'secret project that you should not see', category: 'secret'} )
+  })
   u.register({nick:'a1',name:'na1',email:'a1@example.com',password:'a1',active:true,admin:true})
 
   var web = seneca.export('web')

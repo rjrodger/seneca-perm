@@ -110,6 +110,56 @@ module.exports = function(options) {
     return {allow:!!allow,need:ops,has:opspec}
   }
 
+  // TODO: move this func out of this file
+  function filterAccess(aclAuthProcedure, entityOrList, action, roles, callback) {
+    var filteredList = []
+    var expectedCallbackCount = 0
+    var stopAll = false
+    // TODO: closures inside loops are evil :/ Use some recursion instead
+    function createEntityAccessHandler(entity) {
+      return function(err, authDecision) {
+
+        if(stopAll) return
+
+        if(err) {
+          stopAll = true
+          callback(err, undefined)
+        } else {
+          expectedCallbackCount --
+
+          seneca.log.info('authorization', authDecision.authorize ? 'granted' : 'denied',
+                          'for action [', action, ']',
+                          'on entity [',  entity.id, ']',
+                           'acls:', authDecision.history)
+
+          if(authDecision.authorize) {
+            filteredList.push(entity)
+          }
+          if(expectedCallbackCount === 0) {
+            callback(undefined, filteredList)
+          }
+        }
+      }
+    }
+
+    if(_.isArray(entityOrList)) {
+      expectedCallbackCount = entityOrList.length
+      for(var i = 0 ; i < entityOrList.length ; i++) {
+        aclAuthProcedure.authorize(entityOrList[i], action, roles, createEntityAccessHandler(entityOrList[i]))
+      }
+    } else {
+      expectedCallbackCount = 1
+      aclAuthProcedure.authorize(entityOrList, action, roles, function(err, authDecision) {
+        if(err || !authDecision.authorize) {
+          // TODO: proper 401 propagation
+          callback(err || new Error('unauthorized'), undefined)
+        } else {
+          callback(undefined, entityOrList)
+        }
+      })
+    }
+  }
+
 
   function permcheck(args,done) {
 
@@ -124,11 +174,11 @@ module.exports = function(options) {
     //         either all checks grant permission or one of them denies it
     if( perm ) {
       if( _.isBoolean(perm.allow) ) {
-        proceed(perm.allow,'allow',null,args,prior,done)
+        return proceed(perm.allow,'allow',null,args,prior,done)
       }
       else if( perm.act ) {
         var allow = !!perm.act.find(args)
-        proceed(allow,'act',null,args,prior,done)
+        return proceed(allow,'act',null,args,prior,done)
       }
       else if(perm.roles) {
 
@@ -144,18 +194,39 @@ module.exports = function(options) {
         var aclAuthProcedure = entitiesACLs.find(entityDef)
 
         if(aclAuthProcedure) {
-          aclAuthProcedure.authorize(args.ent, action, perm.roles, function(err, result) {
-            proceed(!err && result.authorize, 'acl', null, args, prior, done)
-          })
-        } else {
-          prior(args, done)
+
+          if(action === 'r') { // for list and load action, filter/authorize after calling the 'prior' function to check obj attributes
+            prior(args, function(err, result) {
+              if(err) {
+                done(err, undefined)
+              }
+              else {
+                filterAccess(aclAuthProcedure, result, action, perm.roles, done)
+              }
+            })
+
+          }
+          else {
+
+            aclAuthProcedure.authorize(args.ent, action, perm.roles, function(err, result) {
+              var authorized = !err && result.authorize
+              seneca.log.info('authorization', authorized ? 'granted' : 'denied',
+                              'for action [', action, ']',
+                              'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
+                               'acls:', result.history)
+              proceed(!err && result.authorize, 'acl', null, args, prior, done)
+            })
+          }
+        }
+        else {
+          return prior(args, done)
         }
       }
       else if( perm.entity ) {
         var opspec = perm.entity.find(args)
 
         var result = allow_ent_op(args,opspec)
-        proceed(result.allow,'entity/operation',{allowed:opspec,need:result.need},args,prior,done)
+        return proceed(result.allow,'entity/operation',{allowed:opspec,need:result.need},args,prior,done)
       }
       else if( perm.own ) {
         var opspec = perm.own.entity.find(args)
