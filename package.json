@@ -1,6 +1,6 @@
 {
   "name": "seneca-perm",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Seneca permissions plugin",
   "main": "perm.js",
   "scripts": {
