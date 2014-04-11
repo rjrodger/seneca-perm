@@ -142,6 +142,9 @@ module.exports = function(options) {
     }
 
     if(_.isArray(entityOrList)) {
+      if(entityOrList.length === 0) { // TODO: test this edge case
+        return callback(undefined, filteredList)
+      }
       expectedCallbackCount = entityOrList.length
       for(var i = 0 ; i < entityOrList.length ; i++) {
         aclAuthProcedure.authorize(entityOrList[i], action, roles, createEntityAccessHandler(entityOrList[i]))
