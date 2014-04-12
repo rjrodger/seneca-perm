@@ -28,9 +28,9 @@ describe('access control list', function() {
       ]
     })
 
-    assert.ok(acl.shouldApply(obj, 'r'))
-    assert.ok(acl.shouldApply(obj, 'w'))
-    assert.ok(!acl.shouldApply(obj, 'd'))
+    assert.ok(acl.shouldApply(obj, 'r').ok)
+    assert.ok(acl.shouldApply(obj, 'w').ok)
+    assert.ok(!acl.shouldApply(obj, 'd').ok)
 
     acl.authorize(obj, 'r', ['EMEA'], function(err, result) {
 
@@ -80,9 +80,9 @@ describe('access control list', function() {
       ]
     })
 
-    assert.ok(acl.shouldApply(obj, 'r'))
-    assert.ok(!acl.shouldApply(obj, 'w'))
-    assert.ok(!acl.shouldApply(obj, 'd'))
+    assert.ok(acl.shouldApply(obj, 'r').ok)
+    assert.ok(!acl.shouldApply(obj, 'w').ok)
+    assert.ok(!acl.shouldApply(obj, 'd').ok)
 
     acl.authorize(obj, 'r', ['EMEA'], function(err, result) {
 
@@ -111,13 +111,13 @@ describe('access control list', function() {
       conditions: []
     })
 
-    assert.ok(acl.shouldApply(obj1, 'r'))
-    assert.ok(!acl.shouldApply(obj1, 'w'))
-    assert.ok(!acl.shouldApply(obj1, 'd'))
+    assert.ok(acl.shouldApply(obj1, 'r').ok)
+    assert.ok(!acl.shouldApply(obj1, 'w').ok)
+    assert.ok(!acl.shouldApply(obj1, 'd').ok)
 
-    assert.ok(acl.shouldApply(obj2, 'r'))
-    assert.ok(!acl.shouldApply(obj2, 'w'))
-    assert.ok(!acl.shouldApply(obj2, 'd'))
+    assert.ok(acl.shouldApply(obj2, 'r').ok)
+    assert.ok(!acl.shouldApply(obj2, 'w').ok)
+    assert.ok(!acl.shouldApply(obj2, 'd').ok)
 
     acl.authorize(obj1, 'r', ['granted'], function(err, result) {
 

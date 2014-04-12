@@ -295,6 +295,22 @@ describe('perm', function() {
             }
           }
         ]
+      },{
+        name: 'access to foobar EMEA entities',
+        roles: ['private_items'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'item'
+        }],
+        control: 'required',
+        actions: 'r',
+        conditions: [{
+            attributes: {
+              'status': 'private'
+            }
+          }
+        ]
       }]
     })
 
@@ -375,6 +391,46 @@ describe('perm', function() {
         assert.isNotNull(err.seneca)
         assert.equal(err.seneca.code, 'perm/fail/acl')
       })
+    })
+
+
+    it('list filtering', function() {
+
+      var psi = si.delegate({perm$:{roles:[]}})
+      var psiPriv = si.delegate({perm$:{roles:['private_items']}})
+
+      var pf1 = psi.make('item',{number: 1, status: 'public'})
+      var pf2 = psiPriv.make('item',{number: 2, status: 'private'})
+      var pf3 = psiPriv.make('item',{number: 3, status: 'private'})
+
+      ;pf1.save$(function(err,pf1){
+        assert.isNull(err)
+        assert.isNotNull(pf1.id)
+
+      ;pf2.save$(function(err,pf2){
+        assert.isNull(err)
+        assert.isNotNull(pf2.id)
+
+      ;pf3.save$(function(err,pf3){
+        assert.isNull(err)
+        assert.isNotNull(pf3.id)
+
+      ;pf1.list$(function(err, publicList) {
+
+        assert.isNull(err)
+        assert.isNotNull(publicList)
+        assert.equal(publicList.length, 1)
+
+      })
+
+
+      ;pf2.list$(function(err, privateList) {
+
+        assert.isNull(err)
+        assert.isNotNull(privateList)
+        assert.equal(privateList.length, )
+
+      }) }) }) })
     })
 
   })

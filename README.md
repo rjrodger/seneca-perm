@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/nherment/seneca-perm.png?branch=master)](https://travis-ci.org/nherment/seneca-perm)
+
 # seneca-perm
 
 ### Node.js Seneca permissions module
