@@ -428,7 +428,7 @@ describe('perm', function() {
 
         assert.isNull(err)
         assert.isNotNull(privateList)
-        assert.equal(privateList.length, )
+        assert.equal(privateList.length, 3)
 
       }) }) }) })
     })
