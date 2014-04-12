@@ -426,7 +426,7 @@ describe('perm', function() {
 
       ;pf2.list$(function(err, privateList) {
 
-        assert.isNull(err)
+        assert.isNull( err )
         assert.isNotNull(privateList)
         assert.equal(privateList.length, 3)
 
