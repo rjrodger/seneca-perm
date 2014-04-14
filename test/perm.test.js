@@ -164,7 +164,6 @@ describe('perm', function() {
       var pb1 = psi.make('bar')
 
 
-
       ;pf1.list$({a:1},function(err,list){
         assert.isNotNull(err)
         assert.equal(null,err.seneca.allowed)
@@ -311,6 +310,22 @@ describe('perm', function() {
             }
           }
         ]
+      },{
+        name: 'owner only for todos',
+        roles: ['my_todos'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'todo'
+        }],
+        control: 'required',
+        actions: 'crud',
+        conditions: [{
+            attributes: {
+              'owner': '{user.id}'
+            }
+          }
+        ]
       }]
     })
 
@@ -431,6 +446,39 @@ describe('perm', function() {
         assert.equal(privateList.length, 3)
 
       }) }) }) })
+    })
+
+    it('context based access', function() {
+
+      var user = {
+        id: 'test_user_'+Date.now()
+      }
+
+      var psi = si.delegate({user$: user, perm$:{roles:['my_todos']}})
+
+      var pf1 = psi.make('todo',{owner: user.id})
+      var pf2 = psi.make('todo',{owner: 'does not exist'})
+
+      ;pf1.save$(function(err,pf1){
+        assert.isNull(err)
+        assert.isNotNull(pf1.id)
+
+      ;pf1.load$(pf1.id,function(err,pf1){
+        assert.isNull(err)
+        assert.isNotNull(pf1.id)
+
+        pf1.a=2
+
+      ;pf1.save$(function(err,pf1){
+        assert.isNull(err)
+
+
+      ;pf2.save$(function(err, pf2) {
+        assert.isNotNull(err)
+
+
+      }) }) }) })
+
     })
 
   })

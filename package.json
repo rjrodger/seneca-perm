@@ -19,7 +19,7 @@
   "author": "Richard Rodger (http://richardrodger.com)",
   "license": "MIT",
   "devDependencies": {
-    "seneca": "0.5.x",
+    "seneca": "0.5.15",
     "connect": "2.12.x",
     "mocha": "1.17.x",
     "gex": "0.1.x",
@@ -29,7 +29,7 @@
   "dependencies": {
     "underscore": "1.5.x",
     "patrun": "0.1.5",
-    "object-tree": "0.2.1"
+    "object-tree": "0.2.4"
   },
   "peerDependencies": {
     "seneca": "*"
