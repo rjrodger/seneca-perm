@@ -110,7 +110,7 @@ module.exports = function(options) {
   }
 
   // TODO: move this func out of this file
-  function filterAccess(aclAuthProcedure, entityOrList, action, roles, callback) {
+  function filterAccess(aclAuthProcedure, entityOrList, action, roles, context, callback) {
     var filteredList = []
     var expectedCallbackCount = 0
     var stopAll = false
@@ -147,11 +147,11 @@ module.exports = function(options) {
       }
       expectedCallbackCount = entityOrList.length
       for(var i = 0 ; i < entityOrList.length ; i++) {
-        aclAuthProcedure.authorize(entityOrList[i], action, roles, createEntityAccessHandler(entityOrList[i]))
+        aclAuthProcedure.authorize(entityOrList[i], action, roles, context, createEntityAccessHandler(entityOrList[i]))
       }
     } else {
       expectedCallbackCount = 1
-      aclAuthProcedure.authorize(entityOrList, action, roles, function(err, authDecision) {
+      aclAuthProcedure.authorize(entityOrList, action, roles, context, function(err, authDecision) {
         if(err || !authDecision.authorize) {
           // TODO: proper 401 propagation
           callback(err || new Error('unauthorized'), undefined)
@@ -171,6 +171,8 @@ module.exports = function(options) {
     }
 
     var perm = args.perm$
+    var user = args.user$
+    console.log('USER USER USER', user)
 
     // TODO: all permissions should be checked to reach a consensus:
     //         either all checks grant permission or one of them denies it
@@ -197,6 +199,11 @@ module.exports = function(options) {
 
         if(aclAuthProcedure) {
 
+          var context = {
+            user: user
+          }
+          console.log('context', context)
+
           // TODO: currently there is a security hole for the update case.
           //       if a user manages to get the id of an entity he should not have access to,
           //       he can do an 'update' on this entity and the update will work.
@@ -208,14 +215,14 @@ module.exports = function(options) {
                 done(err, undefined)
               }
               else {
-                filterAccess(aclAuthProcedure, result, action, perm.roles, done)
+                filterAccess(aclAuthProcedure, result, action, perm.roles, context, done)
               }
             })
 
           }
           else {
 
-            aclAuthProcedure.authorize(args.ent, action, perm.roles, function(err, result) {
+            aclAuthProcedure.authorize(args.ent, action, perm.roles, context, function(err, result) {
               var authorized = !err && result.authorize
               seneca.log.info('authorization', authorized ? 'granted' : 'denied',
                               'for action [', action, ']',
@@ -435,7 +442,7 @@ module.exports = function(options) {
           user.perm = {}
         }
         user.perm.owner = user.id
-        res.seneca = req.seneca = req.seneca.delegate({perm$:perm})
+        res.seneca = req.seneca = req.seneca.delegate({perm$:perm, user$: user})
         req.seneca.user = user
 
         return next()

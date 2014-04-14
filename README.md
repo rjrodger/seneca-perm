@@ -372,6 +372,104 @@ An ACL is composed of:
 
 > IMPORTANT: The order in which ```required``` ACLs are called is not critical. Only the ```sufficient``` and ```requisite``` control flags cause order to become important.
 
+Examples:
+```
+    si.use( '..', {
+      accessControls: [{
+        name: 'access to foobar entities',
+        roles: ['foobar'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'foobar'
+        }],
+        control: 'required',
+        actions: 'crudq',
+        conditions: []
+      },{
+        name: 'access to foobar EMEA entities',
+        roles: ['EMEA'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'foobar'
+        }],
+        control: 'required',
+        actions: 'crud',
+        conditions: [{
+            attributes: {
+              'region': 'EMEA'
+            }
+          }
+        ]
+      },{
+        name: 'access to foobar EMEA entities',
+        roles: ['private_items'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'item'
+        }],
+        control: 'required',
+        actions: 'r',
+        conditions: [{
+            attributes: {
+              'status': 'private'
+            }
+          }
+        ]
+      }]
+    })
+```
+
+### web
+
+Out of the box, this plugin exports a web filter that looks at the logged-in user and runs the ACLs against the user's ```perm.roles``` profile attribute:
+
+    user = {
+      email: 'user@example.com',
+      perm: {
+        roles: ['foobar', 'private_items']
+      }
+    }
+
+### manual validation
+
+You can manually invoke the ACLs by setting the ```perm$``` attribute in the arguments:
+
+      var publicAccess = si.delegate({perm$:{roles:[]}})
+      var pf1 = publicAccess.make('item',{number: 1, status: 'public'})
+
+      var privateAccess = si.delegate({perm$:{roles:['private_items']}})
+      var pf2 = privateAccess.make('item',{number: 2, status: 'private'})
+
+### current context
+
+In some cases, you want to run access controls against the current logged in user.
+For this, you can reference the current user in an ACL:
+
+
+    si.use( '..', {
+      accessControls: [{
+        name: 'todos: owner only',
+        roles: ['my_todos'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'todo'
+        }],
+        control: 'required',
+        actions: 'crud',
+        conditions: [{
+            attributes: {
+              'owner': '{user.id}'
+            }
+          }
+        ]
+      }]
+    })
+
+The above will allow users to only create, read, update or delete 'todo' objects where they are the owner.
 
 ## Test
 

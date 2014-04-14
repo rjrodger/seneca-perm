@@ -54,7 +54,7 @@ describe('access controls', function() {
 
     it('match', function(done) {
 
-      procedure1.authorize(emeaLegal, 'r', ['EMEA', 'legal'], function(err, result) {
+      procedure1.authorize(emeaLegal, 'r', ['EMEA', 'legal'], {}, function(err, result) {
         if(err) {
           return done(err)
         }
@@ -69,7 +69,7 @@ describe('access controls', function() {
 
     it('rejected by the second required', function(done) {
 
-      procedure1.authorize(emeaLegal, 'r', ['EMEA'], function(err, result) {
+      procedure1.authorize(emeaLegal, 'r', ['EMEA'], {}, function(err, result) {
         if(err) {
           return done(err)
         }
@@ -86,7 +86,7 @@ describe('access controls', function() {
 
     it('rejected by the first required', function(done) {
 
-      procedure1.authorize(emeaLegal, 'r', ['legal'], function(err, result) {
+      procedure1.authorize(emeaLegal, 'r', ['legal'], {}, function(err, result) {
         if(err) {
           return done(err)
         }
@@ -103,7 +103,7 @@ describe('access controls', function() {
 
     it('no conditions "sufficient" in ACL gives all access', function(done) {
 
-      procedure1.authorize(emeaLegal, 'r', ['admin'], function(err, result) {
+      procedure1.authorize(emeaLegal, 'r', ['admin'], {}, function(err, result) {
         if(err) {
           return done(err)
         }
@@ -159,7 +159,7 @@ describe('access controls', function() {
 
     it('match', function(done) {
 
-      procedure2.authorize(emea, 'r', ['EMEA', 'requisite'], function(err, result) {
+      procedure2.authorize(emea, 'r', ['EMEA', 'requisite'], {}, function(err, result) {
         if(err) {
           return done(err)
         }
@@ -175,7 +175,7 @@ describe('access controls', function() {
 
     it('no conditions "sufficient" in ACL gives all access', function(done) {
 
-      procedure2.authorize(emea, 'r', ['admin'], function(err, result) {
+      procedure2.authorize(emea, 'r', ['admin'], {}, function(err, result) {
         if(err) {
           return done(err)
         }
@@ -192,7 +192,7 @@ describe('access controls', function() {
 
     it('"requisite" is absolutely mandatory', function(done) {
 
-      procedure2.authorize(emea, 'r', ['EMEA', 'all_access'], function(err, result) {
+      procedure2.authorize(emea, 'r', ['EMEA', 'all_access'], {}, function(err, result) {
         if(err) {
           return done(err)
         }
