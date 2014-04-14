@@ -1,0 +1,20 @@
+{
+  "name": "express-permissions-example",
+  "version": "0.1.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "seneca-project": "0.1.2",
+    "seneca-user": "0.2.6",
+    "seneca-auth": "0.2.7",
+    "seneca-account": "0.1.4",
+    "seneca": "0.5.12",
+    "underscore": "1.5.1",
+    "express": "3.3.5"
+  }
+}

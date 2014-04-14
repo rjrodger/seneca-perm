@@ -1,10 +1,10 @@
 {
   "name": "seneca-perm",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "Seneca permissions plugin",
   "main": "perm.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test/perm.test.js"
+    "test": "./node_modules/mocha/bin/mocha test/*.test.js --reporter spec"
   },
   "repository": {
     "type": "git",
@@ -27,14 +27,11 @@
     "chai": "1.8.x"
   },
   "dependencies": {
-    "underscore": "1.5.x"
+    "underscore": "1.5.x",
+    "patrun": "0.1.5",
+    "object-tree": "0.2.1"
   },
   "peerDependencies": {
     "seneca": "*"
-  },
-  "files": [
-    "README.md",
-    "LICENSE.txt",
-    "perm.js"
-  ]
+  }
 }

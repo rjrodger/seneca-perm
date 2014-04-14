@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/nherment/seneca-perm.png?branch=master)](https://travis-ci.org/nherment/seneca-perm)
+
 # seneca-perm
 
 ### Node.js Seneca permissions module
@@ -13,9 +15,9 @@ The possible permission checks are:
    * _allow_: simple yes/no
    * _act_: allow only specific actions to pass
    * _entity_: allow only specific actions on entities
-   * _own_: allow on specific actions on entities that are 'owned' by given users 
+   * _own_: allow on specific actions on entities that are 'owned' by given users
 
-This plugin also understands when it is used in a web server context, and will add a permission specification to 
+This plugin also understands when it is used in a web server context, and will add a permission specification to
 the req.seneca object if it exists.
 
 A full example, in the context of the seneca data editor, is provided
@@ -41,7 +43,7 @@ var userent = seneca.make('sys','user')
 
 userent.find({email:'alice@example.com'}, function(err,alice){
   alice.perm = {
-    act:[ 
+    act:[
       {foo:'bar', perm$:true},
       {qaz:'lol', perm$:false},
     ]
@@ -60,7 +62,7 @@ var userent = seneca.make('sys','user')
 
 userent.find({email:'alice@example.com'}, function(err,alice){
   alice.perm = {
-    entity:[ 
+    entity:[
       {base:'shop', name:'cart', perm$:'r'},
       {base:'qaz', perm$:'crudq'},
     ]
@@ -150,7 +152,7 @@ npm install seneca-perm
 ## Usage
 
 This plugin has two elements. First, the options define the set of actions that permission checks will apply to. Second, permission
-checks only occur if there is a _perm$_ metadata argument, containing a permissions specification. 
+checks only occur if there is a _perm$_ metadata argument, containing a permissions specification.
 
 ### Permission options
 
@@ -179,7 +181,7 @@ seneca.use( 'perm', {entity:[
 ]})
 ```
 
-The above code specifies that actions on any entity of type -/sys/- or -/foo/bar will have an permission check applied. 
+The above code specifies that actions on any entity of type -/sys/- or -/foo/bar will have an permission check applied.
 
 The _entity_ option saves you from having to specify a permission check for all the entity actions, otherwise you would have to do this:
 
@@ -217,7 +219,7 @@ following properties:
    * entity: an entity type router object, matching the entity action, and specifying the operations permitted
    * own: an entity type router object, matching the entity action, and specifying the operations permitted, if also owner of the entity
 
-You do not normally construct the perm$ object directly, but instead use the _role:perm, cmd:makeperm_ action to create one from a 
+You do not normally construct the perm$ object directly, but instead use the _role:perm, cmd:makeperm_ action to create one from a
 literal definition (you can store this in the -/sys/user entity, for example). If you store the definition in a _perm_ property on
 -/sys/user, and use the perm plugin in a web context, then this is done for you automatically.
 
@@ -265,7 +267,7 @@ This will converted to the perm$ metadata argument:
 {act:router}
 ```
 
-where _router_ is a [seneca router](http://senecajs.org/routing.html) TODO! (the same thing that routes action arguments to plugin functions). 
+where _router_ is a [seneca router](http://senecajs.org/routing.html) TODO! (the same thing that routes action arguments to plugin functions).
 The router matches a given set of action arguments to the permission specification.
 
 You could construct it manually, like so:
@@ -352,11 +354,27 @@ The perm$ metadata argument form is:
 Where the entity property is a router on the entity zone, base and
 name, has data values of the form 'crudq', and the owner is the
 identifier of the user.
- 
+
+
+## Access Controls
+
+An access control procedure runs a set of ACLs against a given pair of ```entity``` and ```action```
+
+An ACL is composed of:
+
+- a list of roles which are required for this ACL to authorize
+- a set of actions (save, update, get, list)
+- on a given entity (the type as well as specific attributes values)
+- a control type (one of required|requisite|sufficient) that determine what happens should the ACL fail or succeed:
+  - ```required``` — The service result must be successful for authentication to continue. If the test fails at this point, the user is not notified until the results of all service tests that reference that interface are complete.
+  - ```requisite``` — The service result must be successful for authentication to continue. However, if a test fails at this point, the user is notified immediately with a message reflecting the first failed required or requisite service test.
+  - ```sufficient``` — The service result is ignored if it fails. However, if the result of a service flagged sufficient is successful and no previous services flagged required have failed, then no other results are required and the user is authenticated to the service.
+
+> IMPORTANT: The order in which ```required``` ACLs are called is not critical. Only the ```sufficient``` and ```requisite``` control flags cause order to become important.
+
 
 ## Test
 
 ```bash
-cd test
-mocha perm.test.js --seneca.log.print
+mocha test/*.test.js --seneca.log.print
 ```
