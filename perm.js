@@ -172,7 +172,6 @@ module.exports = function(options) {
 
     var perm = args.perm$
     var user = args.user$
-    console.log('USER USER USER', user)
 
     // TODO: all permissions should be checked to reach a consensus:
     //         either all checks grant permission or one of them denies it
@@ -202,7 +201,6 @@ module.exports = function(options) {
           var context = {
             user: user
           }
-          console.log('context', context)
 
           // TODO: currently there is a security hole for the update case.
           //       if a user manages to get the id of an entity he should not have access to,
