@@ -154,7 +154,14 @@ module.exports = function(options) {
       aclAuthProcedure.authorize(entityOrList, action, roles, context, function(err, authDecision) {
         if(err || !authDecision.authorize) {
           // TODO: proper 401 propagation
-          callback(err || new Error('unauthorized'), undefined)
+          seneca.fail({
+            action: action,
+            code:'perm/fail/acl',
+            entity:entityOrList,
+            status:denied,
+            history: authDecision.history
+          }, callback);
+          //callback(err || new Error('unauthorized'), undefined)
         } else {
           callback(undefined, entityOrList)
         }
@@ -202,11 +209,6 @@ module.exports = function(options) {
             user: user
           }
 
-          // TODO: currently there is a security hole for the update case.
-          //       if a user manages to get the id of an entity he should not have access to,
-          //       he can do an 'update' on this entity and the update will work.
-          //       To prevent that, we need to first read an entity before it is actually updated
-
           if(action === 'r') { // for list and load action, filter/authorize after calling the 'prior' function to check obj attributes
             prior(args, function(err, result) {
               if(err) {
@@ -218,7 +220,29 @@ module.exports = function(options) {
             })
 
           }
-          else {
+          else if(action === 'u'){
+            var getArgs = _.clone(args)
+            getArgs.cmd = 'load'
+            getArgs.qent = getArgs.ent
+            getArgs.q = {
+              id: getArgs.ent.id
+            }
+            seneca.act(getArgs, function(err, result) {
+              if(err || !result) {
+                return done(err, undefined)
+              } else {
+                aclAuthProcedure.authorize(result, action, perm.roles, context, function(err, result) {
+                  var authorized = !err && result.authorize
+                  seneca.log.info('authorization', authorized ? 'granted' : 'denied',
+                                  'for action [', action, ']',
+                                  'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
+                                   'acls:', result.history)
+                  proceed(!err && result.authorize, 'acl', null, args, prior, done)
+                })
+              }
+            })
+
+          } else {
 
             aclAuthProcedure.authorize(args.ent, action, perm.roles, context, function(err, result) {
               var authorized = !err && result.authorize
