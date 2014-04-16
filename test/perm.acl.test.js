@@ -308,36 +308,36 @@ describe('perm acl', function() {
   })
 
 
-  it('inherit ACLs', function(done) {
+//   it('inherit ACLs', function(done) {
 
-    var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
-    var apacSeneca = si.delegate({perm$:{roles:['foobar']}})
+//     var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
+//     var apacSeneca = si.delegate({perm$:{roles:['foobar']}})
 
-    var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
+//     var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
 
-    ;emeaFoobar.save$(function(err, emeaFoobar) {
-      assert.isNull(err)
-      assert.isNotNull(emeaFoobar.id)
+//     ;emeaFoobar.save$(function(err, emeaFoobar) {
+//       assert.isNull(err)
+//       assert.isNotNull(emeaFoobar.id)
 
-      var item = emeaSeneca.make('item',{foobar: emeaFoobar.id, type: 'inherit'})
+//       var item = emeaSeneca.make('item',{foobar: emeaFoobar.id, type: 'inherit'})
 
-    ;item.save$(function(err, item) {
-      assert.isNull(err)
-      assert.isNotNull(item.id)
+//     ;item.save$(function(err, item) {
+//       assert.isNull(err)
+//       assert.isNotNull(item.id)
 
-    ;item.load$(item.id,function(err,item){
-      assert.isNull(err)
-      assert.isNotNull(item.id)
+//     ;item.load$(item.id,function(err,item){
+//       assert.isNull(err)
+//       assert.isNotNull(item.id)
 
-      var deniedItem = apacSeneca.make('item')
+//       var deniedItem = apacSeneca.make('item')
 
 
-    ;deniedItem.load$(item.id, function(err,deniedItem){
-      assert.isNotNull(err)
-      assert.isNotNull(err.seneca)
-      assert.equal(err.seneca.code, 'perm/fail/acl')
+//     ;deniedItem.load$(item.id, function(err,deniedItem){
+//       assert.isNotNull(err)
+//       assert.isNotNull(err.seneca)
+//       assert.equal(err.seneca.code, 'perm/fail/acl')
 
-      done()
-    }) }) }) })
-  })
+//       done()
+//     }) }) }) })
+//   })
 })
