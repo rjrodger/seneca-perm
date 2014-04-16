@@ -190,4 +190,161 @@ describe('access control list', function() {
   })
 
 
+  it('inheritance user::owner', function(done) {
+
+    var obj = {region: 'EMEA', owner: 123}
+
+    var acl = new AccessControlList({
+      name: 'acl1_required',
+      roles: ['EMEA'],
+      control: 'required',
+      actions: 'r',
+      conditions: [
+        '{user::owner}',
+        {
+          attributes: {
+            'owner': '{user.id}'
+          }
+        }
+      ]
+    })
+
+    assert.ok(acl.shouldApply(obj, 'r').ok)
+
+    acl.authorize(obj, 'r', ['EMEA'], {user: {id: 123}}, function(err, result) {
+
+      assert.ok(!err, err)
+
+      assert.ok(result)
+      assert.ok(result.authorize)
+
+      assert.ok(result.inherit)
+      assert.equal(result.inherit[0].id, 123)
+      assert.ok(result.inherit[0].entity)
+      assert.ok(!result.inherit[0].entity.zone)
+      assert.ok(!result.inherit[0].entity.base)
+      assert.equal(result.inherit[0].entity.name, 'user')
+
+      obj.owner = 1234
+      acl.authorize(obj, 'r', ['EMEA'], {user: {id: 123}}, function(err, result) {
+
+        assert.ok(!err, err)
+
+        assert.ok(result)
+        assert.ok(!result.authorize)
+
+        done()
+
+      })
+
+    })
+
+
+  })
+
+  it('can handle inheritance sys/user::owner', function(done) {
+
+    var obj = {region: 'EMEA', owner: 123}
+
+    var acl = new AccessControlList({
+      name: 'acl1_required',
+      roles: ['EMEA'],
+      control: 'required',
+      actions: 'r',
+      conditions: [
+        '{sys/user::owner}',
+        {
+          attributes: {
+            'owner': '{user.id}'
+          }
+        }
+      ]
+    })
+
+    assert.ok(acl.shouldApply(obj, 'r').ok)
+
+    acl.authorize(obj, 'r', ['EMEA'], {user: {id: 123}}, function(err, result) {
+
+      assert.ok(!err, err)
+
+      assert.ok(result)
+      assert.ok(result.authorize)
+
+      assert.ok(result.inherit)
+      assert.equal(result.inherit[0].id, 123)
+      assert.ok(result.inherit[0].entity)
+      assert.ok(!result.inherit[0].entity.zone)
+      assert.equal(result.inherit[0].entity.base, 'sys')
+      assert.equal(result.inherit[0].entity.name, 'user')
+
+      obj.owner = 1234
+      acl.authorize(obj, 'r', ['EMEA'], {user: {id: 123}}, function(err, result) {
+
+        assert.ok(!err, err)
+
+        assert.ok(result)
+        assert.ok(!result.authorize)
+
+        done()
+
+      })
+
+    })
+
+
+  })
+
+  it('can handle inheritance zone-1/sys/user::owner', function(done) {
+
+    var obj = {region: 'EMEA', owner: 123}
+
+    var acl = new AccessControlList({
+      name: 'acl1_required',
+      roles: ['EMEA'],
+      control: 'required',
+      actions: 'r',
+      conditions: [
+        '{zone-1/sys/user::owner}',
+        {
+          attributes: {
+            'owner': '{user.id}'
+          }
+        }
+      ]
+    })
+
+    assert.ok(acl.shouldApply(obj, 'r').ok)
+
+    acl.authorize(obj, 'r', ['EMEA'], {user: {id: 123}}, function(err, result) {
+
+      assert.ok(!err, err)
+
+      assert.ok(result)
+      assert.ok(result.authorize)
+
+      assert.ok(result.inherit)
+      assert.equal(result.inherit[0].id, 123)
+      assert.ok(result.inherit[0].entity)
+      assert.equal(result.inherit[0].entity.zone, 'zone-1')
+      assert.equal(result.inherit[0].entity.base, 'sys')
+      assert.equal(result.inherit[0].entity.name, 'user')
+
+      obj.owner = 1234
+      acl.authorize(obj, 'r', ['EMEA'], {user: {id: 123}}, function(err, result) {
+
+        assert.ok(!err, err)
+
+        assert.ok(result)
+        assert.ok(!result.authorize)
+
+        done()
+
+      })
+
+    })
+
+
+  })
+
+
 })

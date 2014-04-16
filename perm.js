@@ -233,6 +233,8 @@ module.exports = function(options) {
               } else {
                 aclAuthProcedure.authorize(result, action, perm.roles, context, function(err, result) {
                   var authorized = !err && result.authorize
+
+
                   seneca.log.info('authorization', authorized ? 'granted' : 'denied',
                                   'for action [', action, ']',
                                   'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
