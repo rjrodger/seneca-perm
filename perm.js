@@ -176,16 +176,31 @@ module.exports = function(options) {
           stopAll = true
           callback(err, undefined)
         } else {
-          expectedCallbackCount --
 
           seneca.log.info('authorization', authDecision.authorize ? 'granted' : 'denied',
                           'for action [', action, ']',
                           'on entity [',  entity.id, ']',
                            'acls:', authDecision.history)
 
-          if(authDecision.authorize) {
+          if(authDecision.authorize && authDecision.inherit && authDecision.inherit.length > 0) {
+            var inherit = authDecision.inherit[0]
+            checkACLsWithDBEntity(seneca, entity.entity$, entity, action, roles, context, function(err, inheritedAuthDecision) {
+
+              expectedCallbackCount --
+
+              if(inheritedAuthDecision && inheritedAuthDecision.authorize) {
+                filteredList.push(entity)
+              }
+
+              if(expectedCallbackCount === 0) {
+                callback(undefined, filteredList)
+              }
+            })
+          } else if(authDecision.authorize) {
+            expectedCallbackCount --
             filteredList.push(entity)
           }
+
           if(expectedCallbackCount === 0) {
             callback(undefined, filteredList)
           }
@@ -303,28 +318,57 @@ module.exports = function(options) {
               if(err || !result) {
                 return done(err, undefined)
               } else {
-                aclAuthProcedure.authorize(result, action, perm.roles, context, function(err, result) {
-                  var authorized = !err && result.authorize
+                aclAuthProcedure.authorize(result, action, perm.roles, context, function(err, authDecision) {
+
+                  if(authDecision && authDecision.authorize && authDecision.inherit && authDecision.inherit.length > 0) {
+                    var inherit = authDecision.inherit[0]
+                    checkACLsWithDBEntity(seneca, inherit.entity, inherit.id, action, perm.roles, context, function(err, inheritedAuthDecision) {
+
+                      var authorized = !err && inheritedAuthDecision.authorize
+                      seneca.log.info('authorization', authorized ? 'granted' : 'denied',
+                                      'for action [', action, ']',
+                                      'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
+                                       'acls:', authDecision.history.concat(inheritedAuthDecision.history))
+                      proceed(!err && authDecision.authorize, 'acl', null, args, prior, done)
+                    })
+
+                  } else {
+                    var authorized = !err && authDecision.authorize
 
 
-                  seneca.log.info('authorization', authorized ? 'granted' : 'denied',
-                                  'for action [', action, ']',
-                                  'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
-                                   'acls:', result.history)
-                  proceed(!err && result.authorize, 'acl', null, args, prior, done)
+                    seneca.log.info('authorization', authorized ? 'granted' : 'denied',
+                                    'for action [', action, ']',
+                                    'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
+                                     'acls:', authDecision.history)
+                    proceed(!err && authDecision.authorize, 'acl', null, args, prior, done)
+                  }
                 })
               }
             })
 
           } else {
 
-            aclAuthProcedure.authorize(args.ent, action, perm.roles, context, function(err, result) {
-              var authorized = !err && result.authorize
-              seneca.log.info('authorization', authorized ? 'granted' : 'denied',
-                              'for action [', action, ']',
-                              'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
-                               'acls:', result.history)
-              proceed(!err && result.authorize, 'acl', null, args, prior, done)
+            aclAuthProcedure.authorize(args.ent, action, perm.roles, context, function(err, authDecision) {
+              if(authDecision && authDecision.authorize && authDecision.inherit && authDecision.inherit.length > 0) {
+                var inherit = authDecision.inherit[0]
+                checkACLsWithDBEntity(seneca, inherit.entity, inherit.id, action, perm.roles, context, function(err, inheritedAuthDecision) {
+
+                  var authorized = !err && inheritedAuthDecision.authorize
+                  seneca.log.info('authorization', authorized ? 'granted' : 'denied',
+                                  'for action [', action, ']',
+                                  'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
+                                   'acls:', authDecision.history.concat(inheritedAuthDecision.history))
+                  proceed(!err && inheritedAuthDecision.authorize, 'acl', null, args, prior, done)
+                })
+
+              } else {
+                var authorized = !err && authDecision.authorize
+                seneca.log.info('authorization', authorized ? 'granted' : 'denied',
+                                'for action [', action, ']',
+                                'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
+                                 'acls:', authDecision.history)
+                proceed(!err && authDecision.authorize, 'acl', null, args, prior, done)
+              }
             })
           }
         }

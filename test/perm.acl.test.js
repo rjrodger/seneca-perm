@@ -86,7 +86,7 @@ describe('perm acl', function() {
         name: 'item'
       }],
       control: 'required',
-      actions: 'r',
+      actions: 'crud',
       conditions: [
         '{foobar::foobar}',
         {
@@ -308,7 +308,7 @@ describe('perm acl', function() {
   })
 
 
-  it('inherit ACLs', function(done) {
+  it('inherit ACLs (read)', function(done) {
 
     var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
     var apacSeneca = si.delegate({perm$:{roles:['foobar']}})
@@ -325,15 +325,80 @@ describe('perm acl', function() {
       assert.isNull(err)
       assert.isNotNull(item.id)
 
-    console.log('\n\ninheritance check 1', JSON.stringify(item))
     ;item.load$(item.id,function(err,item){
       assert.isNull(err)
       assert.isNotNull(item.id)
 
       var deniedItem = apacSeneca.make('item')
 
-    console.log('\n\ninheritance check 2', JSON.stringify(deniedItem))
     ;deniedItem.load$(item.id, function(err,deniedItem){
+      assert.isNotNull(err)
+      assert.isNotNull(err.seneca)
+      assert.equal(err.seneca.code, 'perm/fail/acl')
+
+      done()
+    }) }) }) })
+  })
+
+
+  it('inherit ACLs (create)', function(done) {
+
+    var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
+    var apacSeneca = si.delegate({perm$:{roles:['foobar', 'APAC']}})
+
+    var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
+
+    ;emeaFoobar.save$(function(err, emeaFoobar) {
+      assert.isNull(err)
+      assert.isNotNull(emeaFoobar.id)
+
+      var item = emeaSeneca.make('item',{foobar: emeaFoobar.id, type: 'inherit'})
+
+    ;item.save$(function(err, item) {
+      assert.isNull(err)
+      assert.isNotNull(item.id)
+
+
+      var deniedItem = apacSeneca.make('item',{foobar: emeaFoobar.id, type: 'inherit'})
+
+    ;deniedItem.save$(function(err, deniedItem){
+      assert.isNotNull(err)
+      assert.isNotNull(err.seneca)
+      assert.equal(err.seneca.code, 'perm/fail/acl')
+
+      done()
+    }) }) })
+  })
+
+
+  it('inherit ACLs (update)', function(done) {
+
+    var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
+    var apacSeneca = si.delegate({perm$:{roles:['foobar', 'APAC']}})
+
+    var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
+
+    ;emeaFoobar.save$(function(err, emeaFoobar) {
+      assert.isNull(err)
+      assert.isNotNull(emeaFoobar.id)
+
+      var item = emeaSeneca.make('item',{foobar: emeaFoobar.id, type: 'inherit'})
+
+    ;item.save$(function(err, item) {
+      assert.isNull(err)
+      assert.isNotNull(item.id)
+
+
+    ;item.caramel = true
+
+    ;item.save$(function(err, item) {
+      assert.isNull(err)
+      assert.isNotNull(item.id)
+
+
+      var deniedItem = apacSeneca.make('item',{id: item.id})
+
+    ;deniedItem.save$(function(err, deniedItem){
       assert.isNotNull(err)
       assert.isNotNull(err.seneca)
       assert.equal(err.seneca.code, 'perm/fail/acl')
