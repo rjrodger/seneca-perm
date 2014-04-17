@@ -118,194 +118,194 @@ describe('perm acl', function() {
     si.ready(done)
   })
 
-//   it('entity level access', function(done) {
+  it('entity level access', function(done) {
 
-//     var psi = si.delegate({perm$:{roles:['foobar']}})
+    var psi = si.delegate({perm$:{roles:['foobar']}})
 
-//     var pf1 = psi.make('foobar')
+    var pf1 = psi.make('foobar')
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
-//       assert.isNotNull(pf1.id)
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err)
+      assert.isNotNull(pf1.id)
 
-//     ;pf1.load$(pf1.id,function(err,pf1){
-//       assert.isNull(err)
-//       assert.isNotNull(pf1.id)
+    ;pf1.load$(pf1.id,function(err,pf1){
+      assert.isNull(err)
+      assert.isNotNull(pf1.id)
 
-//       pf1.a=2
+      pf1.a=2
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err)
 
-//       done()
+      done()
 
-//     }) }) })
+    }) }) })
 
-//   })
+  })
 
-//   it('attributes based access', function(done) {
+  it('attributes based access', function(done) {
 
-//     var psi = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
+    var psi = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
 
-//     var pf1 = psi.make('foobar',{region:'EMEA'})
+    var pf1 = psi.make('foobar',{region:'EMEA'})
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
-//       assert.isNotNull(pf1.id)
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err)
+      assert.isNotNull(pf1.id)
 
-//     ;pf1.load$(pf1.id,function(err,pf1){
-//       assert.isNull(err)
-//       assert.isNotNull(pf1.id)
+    ;pf1.load$(pf1.id,function(err,pf1){
+      assert.isNull(err)
+      assert.isNotNull(pf1.id)
 
-//       pf1.a=2
+      pf1.a=2
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err)
 
-//       done()
+      done()
 
-//     }) }) })
+    }) }) })
 
-//   })
+  })
 
 
-//   it('attribute based rejection', function(done) {
+  it('attribute based rejection', function(done) {
 
-//     var psi = si.delegate({perm$:{roles:['foobar']}})
+    var psi = si.delegate({perm$:{roles:['foobar']}})
 
-//     var pf1 = psi.make('foobar',{region:'EMEA'})
+    var pf1 = psi.make('foobar',{region:'EMEA'})
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+    ;pf1.save$(function(err,pf1){
+      assert.isNotNull(err)
+      assert.isNotNull(err.seneca)
+      assert.equal(err.seneca.code, 'perm/fail/acl')
 
-//       done()
-//     })
+      done()
+    })
 
-//   })
+  })
 
 
-//   it('entity level rejection', function(done) {
+  it('entity level rejection', function(done) {
 
-//     var psi = si.delegate({perm$:{roles:['EMEA']}})
+    var psi = si.delegate({perm$:{roles:['EMEA']}})
 
-//     var pf1 = psi.make('foobar',{region:'EMEA'})
+    var pf1 = psi.make('foobar',{region:'EMEA'})
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+    ;pf1.save$(function(err,pf1){
+      assert.isNotNull(err)
+      assert.isNotNull(err.seneca)
+      assert.equal(err.seneca.code, 'perm/fail/acl')
 
-//       done()
-//     })
-//   })
+      done()
+    })
+  })
 
 
-//   it('list filtering', function(done) {
+  it('list filtering', function(done) {
 
-//     var psi = si.delegate({perm$:{roles:[]}})
-//     var psiPriv = si.delegate({perm$:{roles:['private_items']}})
+    var psi = si.delegate({perm$:{roles:[]}})
+    var psiPriv = si.delegate({perm$:{roles:['private_items']}})
 
-//     var pf1 = psi.make('item',{number: 1, status: 'public'})
-//     var pf2 = psiPriv.make('item',{number: 2, status: 'private'})
-//     var pf3 = psiPriv.make('item',{number: 3, status: 'private'})
+    var pf1 = psi.make('item',{number: 1, status: 'public'})
+    var pf2 = psiPriv.make('item',{number: 2, status: 'private'})
+    var pf3 = psiPriv.make('item',{number: 3, status: 'private'})
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
-//       assert.isNotNull(pf1.id)
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err)
+      assert.isNotNull(pf1.id)
 
-//     ;pf2.save$(function(err,pf2){
-//       assert.isNull(err)
-//       assert.isNotNull(pf2.id)
+    ;pf2.save$(function(err,pf2){
+      assert.isNull(err)
+      assert.isNotNull(pf2.id)
 
-//     ;pf3.save$(function(err,pf3){
-//       assert.isNull(err)
-//       assert.isNotNull(pf3.id)
+    ;pf3.save$(function(err,pf3){
+      assert.isNull(err)
+      assert.isNotNull(pf3.id)
 
-//     ;pf1.list$(function(err, publicList) {
+    ;pf1.list$(function(err, publicList) {
 
-//       assert.isNull(err)
-//       assert.isNotNull(publicList)
-//       assert.equal(publicList.length, 1)
+      assert.isNull(err)
+      assert.isNotNull(publicList)
+      assert.equal(publicList.length, 1)
 
-//     })
+    })
 
 
-//     ;pf2.list$(function(err, privateList) {
+    ;pf2.list$(function(err, privateList) {
 
-//       assert.isNull( err )
-//       assert.isNotNull(privateList)
-//       assert.equal(privateList.length, 3)
+      assert.isNull( err )
+      assert.isNotNull(privateList)
+      assert.equal(privateList.length, 3)
 
-//       done()
-//     }) }) }) })
-//   })
+      done()
+    }) }) }) })
+  })
 
-//   it('context based access', function(done) {
+  it('context based access', function(done) {
 
-//     var user = {
-//       id: 'test_user_'+Date.now()
-//     }
+    var user = {
+      id: 'test_user_'+Date.now()
+    }
 
-//     var psi = si.delegate({user$: user, perm$:{roles:['my_todos']}})
+    var psi = si.delegate({user$: user, perm$:{roles:['my_todos']}})
 
-//     var pf1 = psi.make('todo',{owner: user.id})
-//     var pf2 = psi.make('todo',{owner: 'does not exist'})
+    var pf1 = psi.make('todo',{owner: user.id})
+    var pf2 = psi.make('todo',{owner: 'does not exist'})
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
-//       assert.isNotNull(pf1.id)
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err)
+      assert.isNotNull(pf1.id)
 
-//     ;pf1.load$(pf1.id,function(err,pf1){
-//       assert.isNull(err)
-//       assert.isNotNull(pf1.id)
+    ;pf1.load$(pf1.id,function(err,pf1){
+      assert.isNull(err)
+      assert.isNotNull(pf1.id)
 
-//       pf1.a=2
+      pf1.a=2
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err)
 
 
-//     ;pf2.save$(function(err, pf2) {
-//       assert.isNotNull(err)
+    ;pf2.save$(function(err, pf2) {
+      assert.isNotNull(err)
 
-//       done()
+      done()
 
-//     }) }) }) })
+    }) }) }) })
 
-//   })
+  })
 
 
-//   it('updating an object runs the ACLs against existing values', function(done) {
+  it('updating an object runs the ACLs against existing values', function(done) {
 
-//     var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
-//     var foobarSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA_READ']}})
-//     var foobar2Seneca = si.delegate({perm$:{roles:['foobar']}})
+    var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
+    var foobarSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA_READ']}})
+    var foobar2Seneca = si.delegate({perm$:{roles:['foobar']}})
 
-//     var pf1 = emeaSeneca.make('foobar',{region:'EMEA'})
+    var pf1 = emeaSeneca.make('foobar',{region:'EMEA'})
 
-//     ;pf1.save$(function(err, pf1) {
-//       assert.isNull(err)
-//       assert.isNotNull(pf1.id)
+    ;pf1.save$(function(err, pf1) {
+      assert.isNull(err)
+      assert.isNotNull(pf1.id)
 
-//       var pf11 = foobarSeneca.make('foobar',{id: pf1.id, region: 'APAC'})
+      var pf11 = foobarSeneca.make('foobar',{id: pf1.id, region: 'APAC'})
 
-//     ;pf11.save$(function(err, pf11) {
-//       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+    ;pf11.save$(function(err, pf11) {
+      assert.isNotNull(err)
+      assert.isNotNull(err.seneca)
+      assert.equal(err.seneca.code, 'perm/fail/acl')
 
-//       var pf12 = foobar2Seneca.make('foobar',{id: pf1.id, region: 'APAC'})
+      var pf12 = foobar2Seneca.make('foobar',{id: pf1.id, region: 'APAC'})
 
-//     ;pf12.save$(function(err, pf11) {
-//       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+    ;pf12.save$(function(err, pf11) {
+      assert.isNotNull(err)
+      assert.isNotNull(err.seneca)
+      assert.equal(err.seneca.code, 'perm/fail/acl')
 
-//       done()
-//     }) }) })
-//   })
+      done()
+    }) }) })
+  })
 
 
   it('inherit ACLs', function(done) {
