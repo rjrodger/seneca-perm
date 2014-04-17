@@ -16,7 +16,7 @@ var name = "perm"
 
 
 module.exports = function(options) {
-  var seneca = this
+  var globalSeneca = this
 
   options = this.util.deepextend({
     status: {
@@ -78,7 +78,7 @@ module.exports = function(options) {
   var denied = options.status.denied
 
   function proceed(allow,type,meta,args,parent,done) {
-    if( !allow ) return seneca.fail(_.extend({},meta||{},{code:'perm/fail/'+type,args:args,status:denied}),done);
+    if( !allow ) return globalSeneca.fail(_.extend({},meta||{},{code:'perm/fail/'+type,args:args,status:denied}),done);
     parent(args,done)
   }
 
@@ -109,8 +109,60 @@ module.exports = function(options) {
     return {allow:!!allow,need:ops,has:opspec}
   }
 
+  function checkACLsWithDBEntity(seneca, entityType, entityOrId, action, roles, context, callback) {
+
+    // TODO: findall instead
+    var aclAuthProcedure = entitiesACLs.find(entityType)
+    if(aclAuthProcedure) {
+
+      if(_.isObject(entityOrId)) {
+        aclAuthProcedure.authorize(entity, action, roles, context, function(err, details) {
+          var authorized = !err && result.authorize
+          seneca.log.info('inheritance authorization', authorized ? 'granted' : 'denied',
+                          'for action [', action, ']',
+                          'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
+                           'acls:', result.history)
+
+          callback(err, details)
+        })
+      } else {
+        var ent = globalSeneca.make(canonize(entityType))
+
+        ent.load$(entityOrId, function(err, entity) {
+          if(err) {
+            return callback(err, null)
+          }
+          aclAuthProcedure.authorize(entity, action, roles, context, function(err, details) {
+            var authorized = !err && details.authorize
+            seneca.log.info('inheritance authorization', authorized ? 'granted' : 'denied',
+                            'for action [', action, ']',
+                            'on entity [', entityType.zone + '/' + entityType.base + '/'+entityType.name, '::'+entity.id+']',
+                             'acls:', details.history)
+
+            callback(err, details)
+          })
+        })
+      }
+    } else {
+      setImmediate(function() {
+        callback(undefined, {
+          service: 'inheritance',
+          authorize: true,
+          control: null,
+          reason: 'ACL inheritance path directs to an entity that does not have ACLs'
+        })
+      })
+
+    }
+  }
+
+  function canonize(entityDef) {
+    return (entityDef.zone || '-') + '/' + (entityDef.base || '-') + '/' + entityDef.name
+  }
+
+
   // TODO: move this func out of this file
-  function filterAccess(aclAuthProcedure, entityOrList, action, roles, context, callback) {
+  function filterAccess(seneca, aclAuthProcedure, entityOrList, action, roles, context, callback) {
     var filteredList = []
     var expectedCallbackCount = 0
     var stopAll = false
@@ -160,10 +212,30 @@ module.exports = function(options) {
             entity:entityOrList,
             status:denied,
             history: authDecision.history
-          }, callback);
+          }, callback)
           //callback(err || new Error('unauthorized'), undefined)
         } else {
-          callback(undefined, entityOrList)
+          if(authDecision.inherit && authDecision.inherit.length > 0) {
+
+            var inherit = authDecision.inherit[0]
+            checkACLsWithDBEntity(seneca, inherit.entity, inherit.id, action, roles, context, function(err, inheritedAuthDecision) {
+              if(err || !inheritedAuthDecision.authorize) {
+                // TODO: proper 401 propagation
+                seneca.fail({
+                  action: action,
+                  code:'perm/fail/acl',
+                  entity:entityOrList,
+                  status:denied,
+                  history: authDecision.history.concat(inheritedAuthDecision.history)
+                }, callback)
+              } else {
+                callback(undefined, entityOrList)
+              }
+            })
+          } else {
+
+            callback(undefined, entityOrList)
+          }
         }
       })
     }
@@ -171,7 +243,7 @@ module.exports = function(options) {
 
 
   function permcheck(args,done) {
-
+    var seneca = this
     var prior = this.prior
     if( !prior ) {
       return seneca.fail({code:'perm/no-prior',args:args},done)
@@ -215,7 +287,7 @@ module.exports = function(options) {
                 done(err, undefined)
               }
               else {
-                filterAccess(aclAuthProcedure, result, action, perm.roles, context, done)
+                filterAccess(seneca, aclAuthProcedure, result, action, perm.roles, context, done)
               }
             })
 
@@ -284,13 +356,13 @@ module.exports = function(options) {
           }
 
           if( id ) {
-            var checkent = seneca.make(ent.canon$({object$:true}))
+            var checkent = globalSeneca.make(ent.canon$({object$:true}))
             checkent.load$(id,function(err,existing){
               if( err ) return done(err);
 
 
               if( existing && existing.owner !== owner ) {
-                return seneca.fail({code:'perm/fail/own',owner:owner,args:args,status:denied},done);
+                return globalSeneca.fail({code:'perm/fail/own',owner:owner,args:args,status:denied},done);
               }
 
               return prior(args,done)
@@ -323,17 +395,17 @@ module.exports = function(options) {
 
 
 
-  seneca.add({init:name}, function(args,done){
+  globalSeneca.add({init:name}, function(args,done){
 
 
     if( _.isBoolean(options.act) && options.act ) {
-      _.each( seneca.list(), function( act ){
-        seneca.add(act,permcheck)
+      _.each( globalSeneca.list(), function( act ){
+        globalSeneca.add(act,permcheck)
       })
     }
     else if( _.isArray( options.act ) ) {
       _.each(options.act,function( pin ){
-        seneca.add(pin,permcheck)
+        globalSeneca.add(pin,permcheck)
       })
     }
 
@@ -346,9 +418,9 @@ module.exports = function(options) {
 
     _.each(options.entity,function( entspec ){
       _.each(cmds,function(cmd){
-        entspec = _.isString(entspec) ? seneca.util.parsecanon(entspec) : entspec
+        entspec = _.isString(entspec) ? globalSeneca.util.parsecanon(entspec) : entspec
         var spec = _.extend({role:'entity',cmd:cmd},entspec)
-        seneca.add(spec,permcheck)
+        globalSeneca.add(spec,permcheck)
       })
     })
 
@@ -357,9 +429,9 @@ module.exports = function(options) {
 
     _.each(options.own,function( entspec ){
       _.each(cmds,function(cmd){
-        entspec = _.isString(entspec) ? seneca.util.parsecanon(entspec) : entspec
+        entspec = _.isString(entspec) ? globalSeneca.util.parsecanon(entspec) : entspec
         var spec = _.extend({role:'entity',cmd:cmd},entspec)
-        seneca.add(spec,permcheck)
+        globalSeneca.add(spec,permcheck)
       })
     })
 
@@ -391,23 +463,23 @@ module.exports = function(options) {
 
 
     function make_router(permspec,name) {
-      var router = seneca.util.router()
+      var router = globalSeneca.util.router()
 
       var pinspec = permspec[name]
       if( _.isArray(pinspec) ) {
         _.each(pinspec,function(entry){
           if( _.isUndefined(entry.perm$) ) {
-            throw seneca.fail({code:'perm/no-perm-defined',entry:entry})
+            throw globalSeneca.fail({code:'perm/no-perm-defined',entry:entry})
           }
 
           var opspec = entry.perm$
-          var typespec = seneca.util.clean(_.clone(entry))
+          var typespec = globalSeneca.util.clean(_.clone(entry))
           router.add(typespec,opspec)
         })
       }
       else if( _.isObject(pinspec) && ('entity'==name || 'own'==name) ) {
         _.each(pinspec,function(perm$,canonstr){
-          router.add( seneca.util.parsecanon(canonstr), perm$ )
+          router.add( globalSeneca.util.parsecanon(canonstr), perm$ )
         })
       }
 
@@ -421,9 +493,6 @@ module.exports = function(options) {
       make_router(permspec,'entity')
     }
     if( permspec.roles ) {
-//       var router = seneca.util.router()
-//       router.add( seneca.util.parsecanon('-/-/-'), 'crudq' )
-//       perm.roles = router
       perm.roles = permspec.roles
     }
     if( permspec.own ) {
@@ -444,7 +513,7 @@ module.exports = function(options) {
 
 
 
-  seneca.add({role:name,cmd:'makeperm'}, function(args,done){
+  globalSeneca.add({role:name,cmd:'makeperm'}, function(args,done){
     var perm = makeperm( args.perm )
     done(null,perm)
   })
@@ -479,7 +548,7 @@ module.exports = function(options) {
   }
 
 
-  seneca.act({role:'web',use:service})
+  globalSeneca.act({role:'web',use:service})
 
 
   return {
