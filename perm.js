@@ -188,7 +188,7 @@ module.exports = function(options) {
 
           if(authDecision.authorize && authDecision.inherit && authDecision.inherit.length > 0) {
             var inherit = authDecision.inherit[0]
-            console.log(JSON.stringify(entity))
+
             checkACLsWithDBEntity(seneca, inherit.entity, inherit.id, action, roles, context, function(err, inheritedAuthDecision) {
 
               expectedCallbackCount --
@@ -196,7 +196,6 @@ module.exports = function(options) {
               if(inheritedAuthDecision && inheritedAuthDecision.authorize) {
                 filteredList.push(entity)
               }
-
               if(expectedCallbackCount === 0) {
                 callback(undefined, filteredList)
               }
@@ -204,6 +203,8 @@ module.exports = function(options) {
           } else if(authDecision.authorize) {
             expectedCallbackCount --
             filteredList.push(entity)
+          } else {
+            expectedCallbackCount --
           }
 
           if(expectedCallbackCount === 0) {
