@@ -112,16 +112,20 @@ module.exports = function(options) {
   function checkACLsWithDBEntity(seneca, entityType, entityOrId, action, roles, context, callback) {
 
     // TODO: findall instead
+    if(_.isString(entityType)) {
+      entityType = seneca.util.parsecanon(entityType)
+    }
+
     var aclAuthProcedure = entitiesACLs.find(entityType)
     if(aclAuthProcedure) {
 
       if(_.isObject(entityOrId)) {
-        aclAuthProcedure.authorize(entity, action, roles, context, function(err, details) {
-          var authorized = !err && result.authorize
+        aclAuthProcedure.authorize(entityOrId, action, roles, context, function(err, details) {
+          var authorized = !err && details.authorize
           seneca.log.info('inheritance authorization', authorized ? 'granted' : 'denied',
                           'for action [', action, ']',
-                          'on entity [', entityDef.zone + '/' + entityDef.base + '/'+entityDef.name, ']',
-                           'acls:', result.history)
+                          'on entity [', entityType.zone + '/' + entityType.base + '/'+entityType.name, ']',
+                           'acls:', details.history)
 
           callback(err, details)
         })
@@ -184,7 +188,8 @@ module.exports = function(options) {
 
           if(authDecision.authorize && authDecision.inherit && authDecision.inherit.length > 0) {
             var inherit = authDecision.inherit[0]
-            checkACLsWithDBEntity(seneca, entity.entity$, entity, action, roles, context, function(err, inheritedAuthDecision) {
+            console.log(JSON.stringify(entity))
+            checkACLsWithDBEntity(seneca, inherit.entity, inherit.id, action, roles, context, function(err, inheritedAuthDecision) {
 
               expectedCallbackCount --
 
