@@ -73,8 +73,8 @@ describe('perm', function() {
         assert.equal('123',out)
       })
 
-      si.act('a:1,c:3',{perm$:{act:act}},function(err,out){
-        assert.isNotNull(err)
+      assert.throws(function() {
+        si.act('a:1,c:3',{perm$:{act:act}});
       })
 
     })
@@ -121,8 +121,8 @@ describe('perm', function() {
         pf1.a=2
       ;pf1.save$(function(err,pf1){
         assert.isNotNull(err)
-        assert.equal('cr',err.seneca.allowed)
-        assert.equal('u',err.seneca.need)
+        assert.equal('cr',err.seneca.valmap.allowed)
+        assert.equal('u',err.seneca.valmap.need)
 
 
       ;pb1.list$({b:2},function(err,list){
@@ -166,8 +166,8 @@ describe('perm', function() {
 
       ;pf1.list$({a:1},function(err,list){
         assert.isNotNull(err)
-        assert.equal(null,err.seneca.allowed)
-        assert.equal('q',err.seneca.need)
+        assert.equal(null,err.seneca.valmap.allowed)
+        assert.equal('q',err.seneca.valmap.need)
 
 
       ;pb1.list$({b:2},function(err,list){
@@ -217,7 +217,7 @@ describe('perm', function() {
           f2.load$(f1.id,function(err,f2o){
             assert.isNotNull(err)
             assert.equal('perm/fail/own',err.seneca.code)
-            assert.equal('o2',err.seneca.owner)
+            assert.equal('o2',err.seneca.valmap.owner)
             //console.log(err)
           })
         })

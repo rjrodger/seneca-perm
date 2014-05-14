@@ -78,7 +78,7 @@ module.exports = function(options) {
   var denied = options.status.denied
 
   function proceed(allow,type,meta,args,parent,done) {
-    if( !allow ) return globalSeneca.fail(_.extend({},meta||{},{code:'perm/fail/'+type,args:args,status:denied}),done);
+    if( !allow ) return done(globalSeneca.fail(_.extend({},meta||{},{code:'perm/fail/'+type,args:args,status:denied})));
     parent(args,done)
   }
 
@@ -227,13 +227,13 @@ module.exports = function(options) {
       aclAuthProcedure.authorize(entityOrList, action, roles, context, function(err, authDecision) {
         if(err || !authDecision.authorize) {
           // TODO: proper 401 propagation
-          seneca.fail({
+          callback(seneca.fail({
             action: action,
             code:'perm/fail/acl',
             entity:entityOrList,
             status:denied,
             history: authDecision.history
-          }, callback)
+          }))
           //callback(err || new Error('unauthorized'), undefined)
         } else {
           if(authDecision.inherit && authDecision.inherit.length > 0) {
@@ -242,13 +242,13 @@ module.exports = function(options) {
             checkACLsWithDBEntity(seneca, inherit.entity, inherit.id, action, roles, context, function(err, inheritedAuthDecision) {
               if(err || !inheritedAuthDecision.authorize) {
                 // TODO: proper 401 propagation
-                seneca.fail({
+                callback(seneca.fail({
                   action: action,
                   code:'perm/fail/acl',
                   entity:entityOrList,
                   status:denied,
                   history: authDecision.history.concat(inheritedAuthDecision.history)
-                }, callback)
+                }))
               } else {
                 callback(undefined, entityOrList)
               }
@@ -267,7 +267,7 @@ module.exports = function(options) {
     var seneca = this
     var prior = this.prior
     if( !prior ) {
-      return seneca.fail({code:'perm/no-prior',args:args},done)
+      return done(seneca.fail({code:'perm/no-prior',args:args}))
     }
 
     var perm = args.perm$
@@ -393,7 +393,7 @@ module.exports = function(options) {
         var owner  = perm.own.owner
         var result = allow_ent_op(args,opspec)
 
-        if( !result.allow ) return seneca.fail({code:'perm/fail/own',allowed:opspec,need:result.need,args:args,status:denied},done);
+        if( !result.allow ) return done(seneca.fail({code:'perm/fail/own',allowed:opspec,need:result.need,args:args,status:denied}));
 
         if( 'save' == args.cmd || 'load' == args.cmd || 'remove' == args.cmd ) {
           var ent = args.ent
@@ -412,7 +412,7 @@ module.exports = function(options) {
 
 
               if( existing && existing.owner !== owner ) {
-                return globalSeneca.fail({code:'perm/fail/own',owner:owner,args:args,status:denied},done);
+                return done(globalSeneca.fail({code:'perm/fail/own',owner:owner,args:args,status:denied}));
               }
 
               return prior(args,done)
@@ -432,7 +432,7 @@ module.exports = function(options) {
           return prior(args,done)
         }
       }
-      else return seneca.fail({code:'perm/no-match',args:args},done)
+      else return done(seneca.fail({code:'perm/no-match',args:args}))
     }
 
     // need an explicit perm$ arg to trigger a permcheck
