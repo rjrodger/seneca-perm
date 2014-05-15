@@ -19,7 +19,7 @@
   "author": "Richard Rodger (http://richardrodger.com)",
   "license": "MIT",
   "devDependencies": {
-    "seneca": "0.5.15",
+    "seneca": "0.5.17",
     "connect": "2.12.x",
     "mocha": "1.17.x",
     "gex": "0.1.x",
