@@ -1,4 +1,4 @@
-[![Build Status](https://api.travis-ci.org/nherment/seneca-perm.png?branch=master)](https://travis-ci.org/nherment/seneca-perm)
+[![Build Status](https://api.travis-ci.org/rjrodger/seneca-perm.png?branch=master)](https://travis-ci.org/rjrodger/seneca-perm)
 
 # seneca-perm
 
