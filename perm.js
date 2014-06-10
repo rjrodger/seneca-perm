@@ -9,6 +9,7 @@ var _ = require('lodash')
 var AccessControlProcedure = require('access-controls')
 
 var EntityAccessControl = require('./lib/EntityAccessControl.js')
+var ACLMicroservicesBuilder = require('./lib/ACLMicroservicesBuilder.js')
 
 var name = "perm"
 
@@ -19,6 +20,8 @@ var name = "perm"
 module.exports = function(options) {
   var globalSeneca = this
 
+  var aclBuilder = new ACLMicroservicesBuilder(globalSeneca)
+
   options = this.util.deepextend({
     status: {
       denied: 401
@@ -27,7 +30,7 @@ module.exports = function(options) {
   },options)
 
   var entitiesACLs = patrun()
-  var acls = new EntityAccessControl()
+  var acls = new EntityAccessControl(globalSeneca)
 
   function buildACLs() {
 
@@ -36,8 +39,9 @@ module.exports = function(options) {
       for(var i = 0 ; i < options.accessControls.length ; i++) {
         var acl = options.accessControls[i]
 
-        for(var j = 0 ; j < acl.entities.length ; j++) {
-          var entity = acl.entities[j]
+        aclBuilder.register(acl)
+//         for(var j = 0 ; j < acl.entities.length ; j++) {
+//           var entity = acl.entities[j]
 
 //           // TODO: do not just push, merge
 //           if(!options.entity) {
@@ -45,7 +49,7 @@ module.exports = function(options) {
 //             options.entity = true
 //           } else {
 //             console.log(options.entity)
-            options.entity.push((entity.zone||'-') +'/' + (entity.base||'-') + '/' +  entity.name)
+//             options.entity.push((entity.zone||'-') +'/' + (entity.base||'-') + '/' +  entity.name)
 //           }
 
 //           var aclProcedure = entitiesACLs.find(entity)
@@ -56,11 +60,12 @@ module.exports = function(options) {
 //           aclProcedure.addAccessControls(acl)
 
 //           entitiesACLs.add(acl.entities[j], aclProcedure)
-        }
+//         }
 
-        acls.register(acl)
+//         acls.register(acl)
 
       }
+      aclBuilder.augmentSeneca(globalSeneca)
     }
   }
 
@@ -151,7 +156,7 @@ module.exports = function(options) {
           base: args.base,
           name: args.name
         }
-        acls.authorizeAction(seneca, args, prior, done)
+        acls.executePermissions(seneca, args, prior, done)
       }
       else if( perm.entity ) {
         var opspec = perm.entity.find(args)

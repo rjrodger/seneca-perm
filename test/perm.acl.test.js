@@ -118,30 +118,33 @@ describe('perm acl', function() {
     si.ready(done)
   })
 
-  it('entity level access', function(done) {
+//   it('entity level access', function(done) {
 
-    var psi = si.delegate({perm$:{roles:['foobar']}})
+//     var psi = si.delegate({perm$:{roles:['foobar']}})
 
-    var pf1 = psi.make('foobar')
+//     var pf1 = psi.make('foobar')
 
-    ;pf1.save$(function(err,pf1){
-      assert.isNull(err)
-      assert.isNotNull(pf1.id)
+//     console.log('create')
+//     ;pf1.save$(function(err,pf1){
+//       assert.isNull(err, err ? err.stack : '')
+//       assert.isNotNull(pf1.id)
 
-    ;pf1.load$(pf1.id,function(err,pf1){
-      assert.isNull(err)
-      assert.isNotNull(pf1.id)
+//     console.log('load')
+//     ;pf1.load$(pf1.id,function(err,pf1){
+//       assert.isNull(err, err ? err.stack : '')
+//       assert.isNotNull(pf1.id)
 
-      pf1.a=2
+//       pf1.a=2
 
-    ;pf1.save$(function(err,pf1){
-      assert.isNull(err)
+//     console.log('save')
+//     ;pf1.save$(function(err,pf1){
+//       assert.isNull(err, 'e3')
 
-      done()
+//       done()
 
-    }) }) })
+//     }) }) })
 
-  })
+//   })
 
 //   it('attributes based access', function(done) {
 
@@ -150,17 +153,17 @@ describe('perm acl', function() {
 //     var pf1 = psi.make('foobar',{region:'EMEA'})
 
 //     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
+//       assert.isNull(err, err ? err.stack : '')
 //       assert.isNotNull(pf1.id)
 
 //     ;pf1.load$(pf1.id,function(err,pf1){
-//       assert.isNull(err)
+//       assert.isNull(err, err ? err.stack : '')
 //       assert.isNotNull(pf1.id)
 
 //       pf1.a=2
 
 //     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
+//       assert.isNull(err, err ? err.stack : '')
 
 //       done()
 
@@ -169,21 +172,20 @@ describe('perm acl', function() {
 //   })
 
 
-//   it('attribute based rejection', function(done) {
+  it('attribute based rejection', function(done) {
 
-//     var psi = si.delegate({perm$:{roles:['foobar']}})
+    var psi = si.delegate({perm$:{roles:['foobar']}})
 
-//     var pf1 = psi.make('foobar',{region:'EMEA'})
+    var pf1 = psi.make('foobar',{region:'EMEA'})
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNotNull(err, 'expected an error but did not get any')
-//       assert.isNotNull(err.seneca, 'expected seneca attrbute on the error')
-//       assert.equal(err.seneca.code, 'perm/fail/acl', 'expected error code to be ACL related')
+    ;pf1.save$(function(err,pf1){
+      assert.ok(err, 'expected a permission denied error but did not get any')
+      assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
-//       done()
-//     })
+      done()
+    })
 
-//   })
+  })
 
 
 //   it('entity level rejection', function(done) {
@@ -194,8 +196,7 @@ describe('perm acl', function() {
 
 //     ;pf1.save$(function(err,pf1){
 //       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+//       assert.equal(err.code, 'perm/fail/acl')
 
 //       done()
 //     })
@@ -227,10 +228,9 @@ describe('perm acl', function() {
 
 //       assert.isNull(err)
 //       assert.isNotNull(publicList)
-//       assert.equal(publicList.length, 1)
+//       assert.equal(publicList.length, 1, 'permissions should filter out forbidden objects')
 
 //     })
-
 
 //     ;pf2.list$(function(err, privateList) {
 
@@ -286,22 +286,20 @@ describe('perm acl', function() {
 //     var pf1 = emeaSeneca.make('foobar',{region:'EMEA'})
 
 //     ;pf1.save$(function(err, pf1) {
-//       assert.isNull(err)
-//       assert.isNotNull(pf1.id)
+//       assert.isNull(err, err ? err.stack : undefined)
+//       assert.isNotNull(pf1.id, 'creating entity should set an id on the entity')
 
 //       var pf11 = foobarSeneca.make('foobar',{id: pf1.id, region: 'APAC'})
 
 //     ;pf11.save$(function(err, pf11) {
-//       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+//       assert.isNotNull(err, 'user should be denied update capability')
+//       assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
 //       var pf12 = foobar2Seneca.make('foobar',{id: pf1.id, region: 'APAC'})
 
 //     ;pf12.save$(function(err, pf11) {
-//       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+//       assert.isNotNull(err, 'user should be denied update capability')
+//       assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
 //       done()
 //     }) }) })
@@ -332,9 +330,8 @@ describe('perm acl', function() {
 //       var deniedItem = apacSeneca.make('item')
 
 //     ;deniedItem.load$(item.id, function(err,deniedItem){
-//       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+//       assert.isNotNull(err, 'expected read access to be denied by inheritance')
+//       assert.equal(err.code, 'perm/fail/acl')
 
 //       done()
 //     }) }) }) })
