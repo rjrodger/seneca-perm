@@ -28,7 +28,7 @@
     "access-controls": "0.1.0"
   },
   "dependencies": {
-    "lodash": "2.4.1",
+    "lodash": "^2.4.1",
     "object-tree": "0.2.4",
     "patrun": "^0.2.0"
   },

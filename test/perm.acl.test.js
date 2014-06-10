@@ -118,58 +118,58 @@ describe('perm acl', function() {
     si.ready(done)
   })
 
-//   it('entity level access', function(done) {
+  it('entity level access', function(done) {
 
-//     var psi = si.delegate({perm$:{roles:['foobar']}})
+    var psi = si.delegate({perm$:{roles:['foobar']}})
 
-//     var pf1 = psi.make('foobar')
+    var pf1 = psi.make('foobar')
 
-//     console.log('create')
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err, err ? err.stack : '')
-//       assert.isNotNull(pf1.id)
+    console.log('create')
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err, err ? err.stack : '')
+      assert.isNotNull(pf1.id)
 
-//     console.log('load')
-//     ;pf1.load$(pf1.id,function(err,pf1){
-//       assert.isNull(err, err ? err.stack : '')
-//       assert.isNotNull(pf1.id)
+    console.log('load', pf1)
+    ;pf1.load$(pf1.id,function(err,pf1){
+      assert.isNull(err, err ? err.stack : '')
+      assert.isNotNull(pf1.id)
 
-//       pf1.a=2
+      pf1.a=2
 
-//     console.log('save')
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err, 'e3')
+    console.log('save')
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err, 'e3')
 
-//       done()
+      done()
 
-//     }) }) })
+    }) }) })
 
-//   })
+  })
 
-//   it('attributes based access', function(done) {
+  it('attributes based access', function(done) {
 
-//     var psi = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
+    var psi = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
 
-//     var pf1 = psi.make('foobar',{region:'EMEA'})
+    var pf1 = psi.make('foobar',{region:'EMEA'})
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err, err ? err.stack : '')
-//       assert.isNotNull(pf1.id)
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err, err ? err.stack : '')
+      assert.isNotNull(pf1.id)
 
-//     ;pf1.load$(pf1.id,function(err,pf1){
-//       assert.isNull(err, err ? err.stack : '')
-//       assert.isNotNull(pf1.id)
+    ;pf1.load$(pf1.id,function(err,pf1){
+      assert.isNull(err, err ? err.stack : '')
+      assert.isNotNull(pf1.id)
 
-//       pf1.a=2
+      pf1.a=2
 
-//     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err, err ? err.stack : '')
+    ;pf1.save$(function(err,pf1){
+      assert.isNull(err, err ? err.stack : '')
 
-//       done()
+      done()
 
-//     }) }) })
+    }) }) })
 
-//   })
+  })
 
 
   it('attribute based rejection', function(done) {
