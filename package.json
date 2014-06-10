@@ -27,9 +27,9 @@
     "chai": "1.8.x"
   },
   "dependencies": {
-    "underscore": "1.5.x",
     "patrun": "0.1.5",
-    "object-tree": "0.2.4"
+    "object-tree": "0.2.4",
+    "lodash": "2.4.1"
   },
   "peerDependencies": {
     "seneca": "*"
