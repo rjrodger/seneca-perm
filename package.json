@@ -24,13 +24,13 @@
     "mocha": "1.17.x",
     "gex": "0.1.x",
     "async": "0.2.x",
-    "chai": "1.8.x",
-    "access-controls": "0.1.0"
+    "chai": "1.8.x"
   },
   "dependencies": {
     "lodash": "^2.4.1",
     "object-tree": "0.2.4",
-    "patrun": "^0.2.0"
+    "patrun": "^0.2.0",
+    "access-controls": "0.1.0"
   },
   "peerDependencies": {
     "seneca": "*"
