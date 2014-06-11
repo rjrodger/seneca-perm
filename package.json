@@ -1,6 +1,6 @@
 {
   "name": "seneca-perm",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Seneca permissions plugin",
   "main": "perm.js",
   "scripts": {
@@ -27,10 +27,10 @@
     "chai": "1.8.x"
   },
   "dependencies": {
-    "lodash": "^2.4.1",
+    "lodash": "2.4.1",
     "object-tree": "0.2.4",
-    "patrun": "^0.2.0",
-    "access-controls": "0.1.0"
+    "patrun": "0.2.0",
+    "access-controls": "0.1.1"
   },
   "peerDependencies": {
     "seneca": "*"
