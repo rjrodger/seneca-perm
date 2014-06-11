@@ -27,7 +27,7 @@ describe('perm acl', function() {
         name: 'foobar'
       }],
       control: 'required',
-      actions: 'crudq',
+      actions: ['save', 'list', 'load', 'remove'],
       conditions: []
     },{
       name: 'read access to foobar EMEA entities',
@@ -38,7 +38,7 @@ describe('perm acl', function() {
         name: 'foobar'
       }],
       control: 'sufficient',
-      actions: 'r',
+      actions: ['list', 'load'],
       conditions: [{
           attributes: {
             'region': 'EMEA'
@@ -54,7 +54,7 @@ describe('perm acl', function() {
         name: 'foobar'
       }],
       control: 'required',
-      actions: 'crud',
+      actions: ['save', 'list', 'load', 'remove'],
       conditions: [{
           attributes: {
             'region': 'EMEA'
@@ -62,7 +62,7 @@ describe('perm acl', function() {
         }
       ]
     },{
-      name: 'access to foobar EMEA entities',
+      name: 'access to foobar private entities',
       roles: ['private_items'],
       entities: [{
         zone: undefined,
@@ -70,7 +70,7 @@ describe('perm acl', function() {
         name: 'item'
       }],
       control: 'required',
-      actions: 'r',
+      actions: ['list', 'load'],
       conditions: [{
           attributes: {
             'status': 'private'
@@ -86,7 +86,7 @@ describe('perm acl', function() {
         name: 'item'
       }],
       control: 'required',
-      actions: 'crud',
+      actions: ['save', 'list', 'load', 'remove'],
       conditions: [
         '{foobar::foobar}',
         {
@@ -104,7 +104,7 @@ describe('perm acl', function() {
         name: 'todo'
       }],
       control: 'required',
-      actions: 'crud',
+      actions: ['save', 'list', 'load', 'remove'],
       conditions: [{
           attributes: {
             'owner': '{user.id}'
@@ -118,74 +118,74 @@ describe('perm acl', function() {
     si.ready(done)
   })
 
-  it('entity level access', function(done) {
+//   it('entity level access', function(done) {
 
-    var psi = si.delegate({perm$:{roles:['foobar']}})
+//     var psi = si.delegate({perm$:{roles:['foobar']}})
 
-    var pf1 = psi.make('foobar')
+//     var pf1 = psi.make('foobar')
 
-    console.log('create')
-    ;pf1.save$(function(err,pf1){
-      assert.isNull(err, err ? err.stack : '')
-      assert.isNotNull(pf1.id)
+//     console.log('create')
+//     ;pf1.save$(function(err,pf1){
+//       assert.isNull(err, err)
+//       assert.isNotNull(pf1.id)
 
-    console.log('load', pf1)
-    ;pf1.load$(pf1.id,function(err,pf1){
-      assert.isNull(err, err ? err.stack : '')
-      assert.isNotNull(pf1.id)
+//     console.log('load', pf1)
+//     ;pf1.load$(pf1.id,function(err,pf1){
+//       assert.isNull(err, err)
+//       assert.isNotNull(pf1.id)
 
-      pf1.a=2
+//       pf1.a=2
 
-    console.log('save')
-    ;pf1.save$(function(err,pf1){
-      assert.isNull(err, 'e3')
+//     console.log('save')
+//     ;pf1.save$(function(err,pf1){
+//       assert.isNull(err, err)
 
-      done()
+//       done()
 
-    }) }) })
+//     }) }) })
 
-  })
+//   })
 
-  it('attributes based access', function(done) {
+//   it('attributes based access', function(done) {
 
-    var psi = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
+//     var psi = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
 
-    var pf1 = psi.make('foobar',{region:'EMEA'})
+//     var pf1 = psi.make('foobar',{region:'EMEA'})
 
-    ;pf1.save$(function(err,pf1){
-      assert.isNull(err, err ? err.stack : '')
-      assert.isNotNull(pf1.id)
+//     ;pf1.save$(function(err,pf1){
+//       assert.isNull(err)
+//       assert.isNotNull(pf1.id)
 
-    ;pf1.load$(pf1.id,function(err,pf1){
-      assert.isNull(err, err ? err.stack : '')
-      assert.isNotNull(pf1.id)
+//     ;pf1.load$(pf1.id,function(err,pf1){
+//       assert.isNull(err)
+//       assert.isNotNull(pf1.id)
 
-      pf1.a=2
+//       pf1.a=2
 
-    ;pf1.save$(function(err,pf1){
-      assert.isNull(err, err ? err.stack : '')
+//     ;pf1.save$(function(err,pf1){
+//       assert.isNull(err)
 
-      done()
+//       done()
 
-    }) }) })
+//     }) }) })
 
-  })
+//   })
 
 
-  it('attribute based rejection', function(done) {
+//   it('attribute based rejection', function(done) {
 
-    var psi = si.delegate({perm$:{roles:['foobar']}})
+//     var psi = si.delegate({perm$:{roles:['foobar']}})
 
-    var pf1 = psi.make('foobar',{region:'EMEA'})
+//     var pf1 = psi.make('foobar',{region:'EMEA'})
 
-    ;pf1.save$(function(err,pf1){
-      assert.ok(err, 'expected a permission denied error but did not get any')
-      assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
+//     ;pf1.save$(function(err,pf1){
+//       assert.ok(err, 'expected a permission denied error but did not get any')
+//       assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
-      done()
-    })
+//       done()
+//     })
 
-  })
+//   })
 
 
 //   it('entity level rejection', function(done) {
@@ -213,33 +213,32 @@ describe('perm acl', function() {
 //     var pf3 = psiPriv.make('item',{number: 3, status: 'private'})
 
 //     ;pf1.save$(function(err,pf1){
-//       assert.isNull(err)
+//       assert.isNull(err, err)
 //       assert.isNotNull(pf1.id)
 
 //     ;pf2.save$(function(err,pf2){
-//       assert.isNull(err)
+//       assert.isNull(err, err)
 //       assert.isNotNull(pf2.id)
 
 //     ;pf3.save$(function(err,pf3){
-//       assert.isNull(err)
+//       assert.isNull(err, err)
 //       assert.isNotNull(pf3.id)
 
 //     ;pf1.list$(function(err, publicList) {
 
-//       assert.isNull(err)
+//       assert.isNull(err, err)
 //       assert.isNotNull(publicList)
 //       assert.equal(publicList.length, 1, 'permissions should filter out forbidden objects')
 
-//     })
 
 //     ;pf2.list$(function(err, privateList) {
 
-//       assert.isNull( err )
+//       assert.isNull( err, err )
 //       assert.isNotNull(privateList)
 //       assert.equal(privateList.length, 3)
 
 //       done()
-//     }) }) }) })
+//     }) }) }) }) })
 //   })
 
 //   it('context based access', function(done) {
@@ -283,7 +282,7 @@ describe('perm acl', function() {
 //     var foobarSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA_READ']}})
 //     var foobar2Seneca = si.delegate({perm$:{roles:['foobar']}})
 
-//     var pf1 = emeaSeneca.make('foobar',{region:'EMEA'})
+//     var pf1 = emeaSeneca.make('foobar', {region:'EMEA'})
 
 //     ;pf1.save$(function(err, pf1) {
 //       assert.isNull(err, err ? err.stack : undefined)
@@ -292,12 +291,12 @@ describe('perm acl', function() {
 //       var pf11 = foobarSeneca.make('foobar',{id: pf1.id, region: 'APAC'})
 
 //     ;pf11.save$(function(err, pf11) {
-//       assert.isNotNull(err, 'user should be denied update capability')
+//       assert.isNotNull(err, 'user should be denied update capability because he can only update EMEA entities')
 //       assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
 //       var pf12 = foobar2Seneca.make('foobar',{id: pf1.id, region: 'APAC'})
 
-//     ;pf12.save$(function(err, pf11) {
+//     ;pf12.save$(function(err, pf12) {
 //       assert.isNotNull(err, 'user should be denied update capability')
 //       assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
@@ -346,61 +345,59 @@ describe('perm acl', function() {
 //     var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
 
 //     ;emeaFoobar.save$(function(err, emeaFoobar) {
-//       assert.isNull(err)
+//       assert.isNull(err, err)
 //       assert.isNotNull(emeaFoobar.id)
 
 //       var item = emeaSeneca.make('item',{foobar: emeaFoobar.id, type: 'inherit'})
 
 //     ;item.save$(function(err, item) {
-//       assert.isNull(err)
+//       assert.isNull(err, err)
 //       assert.isNotNull(item.id)
 
 
 //       var deniedItem = apacSeneca.make('item',{foobar: emeaFoobar.id, type: 'inherit'})
 
 //     ;deniedItem.save$(function(err, deniedItem){
-//       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+//       assert.isNotNull(err, 'expected create capability to be denied')
+//       assert.equal(err.code, 'perm/fail/acl')
 
 //       done()
 //     }) }) })
 //   })
 
 
-//   it('inherit ACLs (update)', function(done) {
+  it('inherit ACLs (update)', function(done) {
 
-//     var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
-//     var apacSeneca = si.delegate({perm$:{roles:['foobar', 'APAC']}})
+    var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
+    var apacSeneca = si.delegate({perm$:{roles:['foobar', 'APAC']}})
 
-//     var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
+    var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
 
-//     ;emeaFoobar.save$(function(err, emeaFoobar) {
-//       assert.isNull(err)
-//       assert.isNotNull(emeaFoobar.id)
+    ;emeaFoobar.save$(function(err, emeaFoobar) {
+      assert.isNull(err, err)
+      assert.isNotNull(emeaFoobar.id, 'missing EMEA entity id')
 
-//       var item = emeaSeneca.make('item',{foobar: emeaFoobar.id, type: 'inherit'})
+      var item = emeaSeneca.make('item',{foobar: emeaFoobar.id, type: 'inherit'})
 
-//     ;item.save$(function(err, item) {
-//       assert.isNull(err)
-//       assert.isNotNull(item.id)
-
-
-//     ;item.caramel = true
-
-//     ;item.save$(function(err, item) {
-//       assert.isNull(err)
-//       assert.isNotNull(item.id)
+    ;item.save$(function(err, item) {
+      assert.isNull(err, err)
+      assert.isNotNull(item.id, 'missing inheritance emea entity id')
 
 
-//       var deniedItem = apacSeneca.make('item',{id: item.id})
+    ;item.caramel = true
 
-//     ;deniedItem.save$(function(err, deniedItem){
-//       assert.isNotNull(err)
-//       assert.isNotNull(err.seneca)
-//       assert.equal(err.seneca.code, 'perm/fail/acl')
+    ;item.save$(function(err, item) {
+      assert.isNull(err, err)
+      assert.isNotNull(item.id, 'missing EMEA entity id on update')
 
-//       done()
-//     }) }) }) })
-//   })
+
+      var deniedItem = apacSeneca.make('item',{id: item.id})
+
+    ;deniedItem.save$(function(err, deniedItem){
+      assert.isNotNull(err, 'expected update capability to be denied due to inheritance')
+      assert.equal(err.code, 'perm/fail/acl')
+
+      done()
+    }) }) }) })
+  })
 })
