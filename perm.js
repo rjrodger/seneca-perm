@@ -8,7 +8,6 @@ var _ = require('lodash')
 
 var AccessControlProcedure = require('access-controls')
 
-var EntityAccessControl = require('./lib/EntityAccessControl.js')
 var ACLMicroservicesBuilder = require('./lib/ACLMicroservicesBuilder.js')
 
 var name = "perm"
@@ -30,7 +29,6 @@ module.exports = function(options) {
   },options)
 
   var entitiesACLs = patrun()
-  var acls = new EntityAccessControl(globalSeneca)
 
   function buildACLs() {
 
@@ -38,31 +36,7 @@ module.exports = function(options) {
 
       for(var i = 0 ; i < options.accessControls.length ; i++) {
         var acl = options.accessControls[i]
-
         aclBuilder.register(acl)
-//         for(var j = 0 ; j < acl.entities.length ; j++) {
-//           var entity = acl.entities[j]
-
-//           // TODO: do not just push, merge
-//           if(!options.entity) {
-//             console.log('RUN PERMS FOR ALL ENTITIES')
-//             options.entity = true
-//           } else {
-//             console.log(options.entity)
-//             options.entity.push((entity.zone||'-') +'/' + (entity.base||'-') + '/' +  entity.name)
-//           }
-
-//           var aclProcedure = entitiesACLs.find(entity)
-
-//           if(!aclProcedure) {
-//             aclProcedure = new AccessControlProcedure()
-//           }
-//           aclProcedure.addAccessControls(acl)
-
-//           entitiesACLs.add(acl.entities[j], aclProcedure)
-//         }
-
-//         acls.register(acl)
 
       }
       aclBuilder.augmentSeneca(globalSeneca)
