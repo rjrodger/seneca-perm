@@ -29,7 +29,7 @@ describe('perm acl', function() {
       control: 'required',
       actions: ['save', 'list', 'load', 'remove'],
       conditions: []
-    },{
+    }, {
       name: 'read access to foobar EMEA entities',
       roles: ['EMEA_READ'],
       entities: [{
@@ -45,7 +45,23 @@ describe('perm acl', function() {
           }
         }
       ]
-    },{
+    }, {
+      name: 'write access to foobar NORAM entities',
+      roles: ['NORAM_WRITE'],
+      entities: [{
+        zone: undefined,
+        base: undefined,
+        name: 'foobar'
+      }],
+      control: 'required',
+      actions: ['save'],
+      conditions: [{
+          attributes: {
+            'region': 'NORAM'
+          }
+        }
+      ]
+    }, {
       name: 'access to foobar EMEA entities',
       roles: ['EMEA'],
       entities: [{
@@ -146,6 +162,40 @@ describe('perm acl', function() {
 
   })
 
+  it('ACL save attributes based access/deny', function(done) {
+
+    var psiNoram = si.delegate({perm$:{roles:['foobar', 'NORAM_WRITE']}})
+
+    var pf1Noram = psiNoram.make('foobar',{region:'NORAM'})
+
+    ;pf1Noram.save$(function(err, pf1Noram) {
+      assert.isNull(err, err)
+      assert.isNotNull(pf1Noram.id)
+
+    ;pf1Noram.load$(pf1Noram.id,function(err, pf1Noram) {
+      assert.isNull(err, err)
+      assert.isNotNull(pf1Noram.id)
+
+      pf1Noram.a=2
+
+    ;pf1Noram.save$(function(err, pf1Noram) {
+      assert.isNull(err, err)
+
+
+      var psi = si.delegate({perm$:{roles:['foobar']}})
+      var pf1 = psi.make('foobar',{region:'NORAM'})
+
+    ;pf1.save$(function(err, empty) {
+      assert.ok(err, 'expected a permission denied error but did not get any')
+      assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
+
+
+      done()
+
+    }) }) }) })
+
+  })
+
   it('attributes based access', function(done) {
 
     var psi = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
@@ -178,7 +228,7 @@ describe('perm acl', function() {
 
     var pf1 = psi.make('foobar',{region:'EMEA'})
 
-    ;pf1.save$(function(err,pf1){
+    ;pf1.save$(function(err, pf1) {
       assert.ok(err, 'expected a permission denied error but did not get any')
       assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
@@ -195,7 +245,7 @@ describe('perm acl', function() {
     var pf1 = psi.make('foobar',{region:'EMEA'})
 
     ;pf1.save$(function(err,pf1){
-      assert.isNotNull(err)
+      assert.isNotNull(err, 'expected ACL error but did not get any')
       assert.equal(err.code, 'perm/fail/acl')
 
       done()
