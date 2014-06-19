@@ -2,7 +2,6 @@
 "use strict";
 
 var util = require('util')
-var patrun = require('patrun')
 
 var _ = require('lodash')
 
@@ -28,17 +27,10 @@ module.exports = function(options) {
     anon:{}
   },options)
 
-  var entitiesACLs = patrun()
-
   function buildACLs() {
 
     if(options.accessControls) {
-
-      for(var i = 0 ; i < options.accessControls.length ; i++) {
-        var acl = options.accessControls[i]
-        aclBuilder.register(acl)
-
-      }
+      aclBuilder.register(options.accessControls)
       aclBuilder.augmentSeneca(globalSeneca)
     }
   }
