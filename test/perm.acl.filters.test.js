@@ -27,7 +27,7 @@ describe('perm acl', function() {
         name: 'foobar'
       }],
       control: 'filter',
-      actions: ['save', 'list', 'load', 'remove'],
+      actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
       conditions: [],
       filters: {
         region: false

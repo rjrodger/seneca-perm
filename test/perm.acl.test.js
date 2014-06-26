@@ -27,7 +27,7 @@ describe('perm acl', function() {
         name: 'foobar'
       }],
       control: 'required',
-      actions: ['save', 'list', 'load', 'remove'],
+      actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
       conditions: []
     }, {
       name: 'read access to foobar EMEA entities',
@@ -54,7 +54,7 @@ describe('perm acl', function() {
         name: 'foobar'
       }],
       control: 'required',
-      actions: ['save'],
+      actions: ['save_new', 'save_existing'],
       conditions: [{
           attributes: {
             'region': 'NORAM'
@@ -70,7 +70,7 @@ describe('perm acl', function() {
         name: 'foobar'
       }],
       control: 'required',
-      actions: ['save', 'list', 'load', 'remove'],
+      actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
       conditions: [{
           attributes: {
             'region': 'EMEA'
@@ -102,7 +102,7 @@ describe('perm acl', function() {
         name: 'item'
       }],
       control: 'required',
-      actions: ['save', 'list', 'load', 'remove'],
+      actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
       conditions: [
         '{foobar::foobar}',
         {
@@ -120,7 +120,7 @@ describe('perm acl', function() {
         name: 'todo'
       }],
       control: 'required',
-      actions: ['save', 'list', 'load', 'remove'],
+      actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
       conditions: [{
           attributes: {
             'owner': '{user.id}'
@@ -140,19 +140,16 @@ describe('perm acl', function() {
 
     var pf1 = psi.make('foobar')
 
-    console.log('create')
     ;pf1.save$(function(err,pf1){
       assert.isNull(err, err)
       assert.isNotNull(pf1.id)
 
-    console.log('load', pf1)
     ;pf1.load$(pf1.id,function(err,pf1){
       assert.isNull(err, err)
       assert.isNotNull(pf1.id)
 
       pf1.a=2
 
-    console.log('save')
     ;pf1.save$(function(err,pf1){
       assert.isNull(err, err)
 
