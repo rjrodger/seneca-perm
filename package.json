@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "lodash": "2.4.1",
-    "access-controls": "0.3.2"
+    "access-controls": "0.3.x"
   },
   "peerDependencies": {
     "seneca": "*"
