@@ -28,7 +28,6 @@ module.exports = function(options) {
   },options)
 
   function buildACLs() {
-
     if(options.accessControls) {
       aclBuilder.register(options.accessControls)
       aclBuilder.augmentSeneca(globalSeneca)
@@ -186,7 +185,6 @@ module.exports = function(options) {
   }
 
 
-
   globalSeneca.add({init:name}, function(args,done){
 
     if( _.isBoolean(options.act) && options.act ) {
@@ -225,7 +223,6 @@ module.exports = function(options) {
         globalSeneca.add(spec,permcheck)
       })
     })
-
 
     done()
   })
