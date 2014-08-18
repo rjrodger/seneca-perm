@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "lodash": "2.4.1",
-    "access-controls": "git://github.com/david-cahill/node-access-controls.git#master"
+    "access-controls": "0.3.0"
   },
   "peerDependencies": {
     "seneca": "*"
