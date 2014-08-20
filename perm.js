@@ -29,9 +29,23 @@ module.exports = function(options) {
 
   function buildACLs() {
     if(options.accessControls) {
-      aclBuilder.register(options.accessControls, options.allowedProperties)
+      var allowedProperties = buildPropertiesMap(options.allowedProperties)
+      aclBuilder.register(options.accessControls, allowedProperties)
       aclBuilder.augmentSeneca(globalSeneca)
     }
+  }
+
+  function buildPropertiesMap(properties) {
+    var allowedProperties = {}
+    for(var i = 0; i < properties.length; i++) {
+      var key = canonize(properties[i].entity)
+      allowedProperties[key] = properties[i].fields
+    }
+    return allowedProperties
+  }
+
+  function canonize(entityDef) {
+    return (entityDef.zone || '-') + '/' + (entityDef.base || '-') + '/' + entityDef.name
   }
 
   function getAction(args) {
