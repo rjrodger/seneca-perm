@@ -29,6 +29,14 @@ describe('perm acl', function() {
       control: 'required',
       actions: ['remove'],
       conditions: []
+    }],
+    allowedProperties: [{
+      entity: {
+      zone: undefined,
+      base: undefined,
+      name: 'item'
+      },
+      fields: ['id','name', 'number']
     }]
   })
 

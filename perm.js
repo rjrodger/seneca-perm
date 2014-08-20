@@ -28,7 +28,7 @@ module.exports = function(options) {
   },options)
 
   function buildACLs() {
-    if(options.accessControls) {
+    if(options.accessControls && options.allowedProperties) {
       var allowedProperties = buildPropertiesMap(options.allowedProperties)
       aclBuilder.register(options.accessControls, allowedProperties)
       aclBuilder.augmentSeneca(globalSeneca)

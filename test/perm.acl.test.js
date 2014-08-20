@@ -17,7 +17,7 @@ describe('perm acl', function() {
 
   var si = seneca()
 
-  si.use( '..', {
+  si.use( '../perm.js', {
     accessControls: [{
       name: 'access to foobar entities',
       roles: ['foobar'],
@@ -127,11 +127,51 @@ describe('perm acl', function() {
           }
         }
       ]
+    },
+    {
+      name: 'hard set to true',
+      roles: ['email_admin'],
+      entities: [{
+        zone: undefined,
+        base: undefined,
+        name: 'email'
+      }],
+      hard: true,
+      control: 'required',
+      actions: ['load', 'save_new', 'save_existing', 'list']
+    }],
+    allowedProperties: [{
+      entity: {
+      zone: undefined,
+      base: undefined,
+      name: 'email'
+      },
+      fields: ['name', 'number']
     }]
   })
 
   it('seneca ready', function(done) {
     si.ready(done)
+  })
+
+  it('access denied - hard set to true - return permission denied', function(done) {
+    var psi  = si.delegate({perm$:{roles:[]}})
+
+    var emailItem1 = psi.make('email',{id: 'item1', name: 'Item 1', number: 1, status: 'private'})
+   
+    emailItem1.save$(function(err,emailItem1){
+      assert.isNull(err, err)
+      assert.isNotNull(emailItem1.id)
+      
+    })
+
+    emailItem1.list$(function(err, publicList) {
+      assert.isNotNull(err, err)
+      assert.isNotNull(publicList)
+      assert.equal(publicList.length,0)
+    })
+
+    done()
   })
 
   it('entity level access', function(done) {
@@ -187,8 +227,8 @@ describe('perm acl', function() {
       assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
 
+     
       done()
-
     }) }) }) })
 
   })
@@ -212,8 +252,8 @@ describe('perm acl', function() {
     ;pf1.save$(function(err,pf1){
       assert.isNull(err)
 
-      done()
-
+      
+    done()
     }) }) })
 
   })
@@ -445,4 +485,5 @@ describe('perm acl', function() {
       done()
     }) }) }) })
   })
+
 })
