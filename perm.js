@@ -28,7 +28,7 @@ module.exports = function(options) {
   },options)
 
   function buildACLs() {
-    if(options.accessControls && options.allowedProperties) {
+    if(options.accessControls) {
       var allowedProperties = buildPropertiesMap(options.allowedProperties)
       aclBuilder.register(options.accessControls, allowedProperties)
       aclBuilder.augmentSeneca(globalSeneca)
@@ -37,9 +37,11 @@ module.exports = function(options) {
 
   function buildPropertiesMap(properties) {
     var allowedProperties = {}
-    for(var i = 0; i < properties.length; i++) {
-      var key = canonize(properties[i].entity)
-      allowedProperties[key] = properties[i].fields
+    if(properties) {
+      for(var i = 0; i < properties.length; i++) {
+        var key = canonize(properties[i].entity)
+        allowedProperties[key] = properties[i].fields
+      }
     }
     return allowedProperties
   }
