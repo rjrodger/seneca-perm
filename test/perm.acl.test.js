@@ -17,204 +17,124 @@ describe('perm acl', function() {
 
   var si = seneca()
 
-  si.use( '../perm.js', {
-    accessControls: [{
-      name: 'access to foobar entities',
-      roles: ['foobar'],
-      entities: [{
-        zone: undefined,
-        base: undefined,
-        name: 'foobar'
-      }],
-      control: 'required',
-      actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
-      conditions: []
-    }, {
-      name: 'read access to foobar EMEA entities',
-      roles: ['EMEA_READ'],
-      entities: [{
-        zone: undefined,
-        base: undefined,
-        name: 'foobar'
-      }],
-      control: 'sufficient',
-      actions: ['list', 'load'],
-      conditions: [{
-          attributes: {
-            'region': 'EMEA'
+  si.use( '..', {
+    accessControls: [
+      {
+        name: 'access to foobar entities',
+        roles: ['foobar'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'foobar'
+        }],
+        control: 'required',
+        actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
+        conditions: []
+      }, {
+        name: 'read access to foobar EMEA entities',
+        roles: ['EMEA_READ'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'foobar'
+        }],
+        control: 'sufficient',
+        actions: ['list', 'load'],
+        conditions: [{
+            attributes: {
+              'region': 'EMEA'
+            }
           }
-        }
-      ]
-    }, {
-      name: 'write access to foobar NORAM entities',
-      roles: ['NORAM_WRITE'],
-      entities: [{
-        zone: undefined,
-        base: undefined,
-        name: 'foobar'
-      }],
-      control: 'required',
-      actions: ['save_new', 'save_existing'],
-      conditions: [{
-          attributes: {
-            'region': 'NORAM'
+        ]
+      }, {
+        name: 'write access to foobar NORAM entities',
+        roles: ['NORAM_WRITE'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'foobar'
+        }],
+        control: 'required',
+        actions: ['save_new', 'save_existing'],
+        conditions: [{
+            attributes: {
+              'region': 'NORAM'
+            }
           }
-        }
-      ]
-    }, {
-      name: 'access to foobar EMEA entities',
-      roles: ['EMEA'],
-      entities: [{
-        zone: undefined,
-        base: undefined,
-        name: 'foobar'
-      }],
-      control: 'required',
-      actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
-      conditions: [{
-          attributes: {
-            'region': 'EMEA'
+        ]
+      }, {
+        name: 'access to foobar EMEA entities',
+        roles: ['EMEA'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'foobar'
+        }],
+        control: 'required',
+        actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
+        conditions: [{
+            attributes: {
+              'region': 'EMEA'
+            }
           }
-        }
-      ]
-    },{
-      name: 'access to foobar private entities',
-      roles: ['private_items'],
-      entities: [{
-        zone: undefined,
-        base: undefined,
-        name: 'item'
-      }],
-      control: 'required',
-      actions: ['list', 'load'],
-      conditions: [{
-          attributes: {
-            'status': 'private'
+        ]
+      },{
+        name: 'access to foobar private entities',
+        roles: ['private_items'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'item'
+        }],
+        control: 'required',
+        actions: ['list', 'load'],
+        conditions: [{
+            attributes: {
+              'status': 'private'
+            }
           }
-        }
-      ]
-    },{
-      name: 'item: inherit foobar reference',
-      roles: [],
-      entities: [{
-        zone: undefined,
-        base: undefined,
-        name: 'item'
-      }],
-      control: 'required',
-      actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
-      conditions: [
-        '{foobar::foobar}',
-        {
-          attributes: {
-            'type': 'inherit'
+        ]
+      },{
+        name: 'item: inherit foobar reference',
+        roles: [],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'item'
+        }],
+        control: 'required',
+        actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
+        conditions: [
+          '{foobar::foobar}',
+          {
+            attributes: {
+              'type': 'inherit'
+            }
           }
-        }
-      ]
-    },{
-      name: 'owner only for todos',
-      roles: ['my_todos'],
-      entities: [{
-        zone: undefined,
-        base: undefined,
-        name: 'todo'
-      }],
-      control: 'required',
-      actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
-      conditions: [{
-          attributes: {
-            'owner': '{user.id}'
+        ]
+      },{
+        name: 'owner only for todos',
+        roles: ['my_todos'],
+        entities: [{
+          zone: undefined,
+          base: undefined,
+          name: 'todo'
+        }],
+        control: 'required',
+        actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
+        conditions: [{
+            attributes: {
+              'owner': '{user.id}'
+            }
           }
-        }
-      ]
-    },
-    {
-      name: 'hard set to true',
-      roles: ['email_admin'],
-      entities: [{
-        zone: undefined,
-        base: undefined,
-        name: 'email'
-      }],
-      hard: true,
-      control: 'required',
-      actions: ['load', 'save_new', 'save_existing', 'list']
-    },
-    {
-      name: 'hard set to false',
-      roles: ['item_admin'],
-      entities: [{
-        zone: undefined,
-        base: undefined,
-        name: 'list_item'
-      }],
-      hard: false,
-      control: 'required',
-      actions: ['load','save_new', 'save_existing', 'list']
-    }],
-    allowedProperties: [{
-      entity: {
-      zone: undefined,
-      base: undefined,
-      name: 'list_item'
-      },
-      fields: ['name', 'number']
-    }]
+        ]
+      }
+    ]
+
   })
 
   it('seneca ready', function(done) {
     si.ready(done)
-  })
-
-  it('access denied - hard set to true - return permission denied', function(done) {
-    var psi  = si.delegate({perm$:{roles:['email_admin']}})
-    var psiList = si.delegate({perm$:{roles:['test_role']}})
-
-    var emailItem1 = psi.make('email',{id: 'item1', name: 'Item 1', number: 1, status: 'private'})
-    var emailItem2 = psiList.make('email')
-
-    ;emailItem1.save$(function(err,emailItem1){
-      assert.isNull(err, err)
-      assert.isNotNull(emailItem1.id)
-      
-      ;emailItem2.list$(function(err, publicList) {
-        assert.isNull(err, err)
-        assert.isNotNull(publicList)
-        assert.equal(publicList.length,0)
-
-        done()
-      })
-
-    })
- 
-  })
-
-  it('access denied - hard set to false - return allowed fields only', function(done) {
-
-    var psi  = si.delegate({perm$:{roles:['item_admin']}})
-    var psiList  = si.delegate({perm$:{roles:['test_role']}})
-
-    var listItem1 = psi.make('list_item',{id: 'item1', name: 'Item 1', number: 1, status: 'private'})
-    var listItem2 = psiList.make('list_item')
-    
-    ;listItem1.save$(function(err,listItem1){
-      assert.isNull(err, err)
-      assert.isNotNull(listItem1.id)
-      
-      ;listItem2.list$(function(err, publicList) {
-        assert.isNull(err, err)
-        assert.isNotNull(publicList)
-        assert.equal(publicList[0].hasOwnProperty('name'), true)
-        assert.equal(publicList[0].hasOwnProperty('number'), true)
-        assert.equal(publicList[0].hasOwnProperty('id'), false)
-        assert.equal(publicList[0].hasOwnProperty('status'), false)
-        assert.equal(publicList.length, 1)
-
-        done()
-      }) 
-
-    })
-    
   })
 
   it('entity level access', function(done) {
@@ -355,7 +275,7 @@ describe('perm acl', function() {
       assert.isNotNull(pf3.id)
 
     ;pf1.list$(function(err, publicList) {
-
+      console.log("**** list filtering **** = " + JSON.stringify(publicList))
       assert.isNull(err, err)
       assert.isNotNull(publicList)
       assert.equal(publicList.length, 1, 'permissions should filter out forbidden objects')
