@@ -177,13 +177,16 @@ describe('perm acl', function() {
       assert.isNull(err, err)
       assert.isNotNull(emailItem1.id)
       
-    ;emailItem2.list$(function(err, publicList) {
-      assert.isNotNull(err, err)
-      assert.isNotNull(publicList)
-      assert.equal(publicList.length,0)
-    }) })
+      ;emailItem2.list$(function(err, publicList) {
+        assert.isNull(err, err)
+        assert.isNotNull(publicList)
+        assert.equal(publicList.length,0)
 
-    done()
+        done()
+      })
+
+    })
+ 
   })
 
   it('access denied - hard set to false - return allowed fields only', function(done) {
