@@ -187,6 +187,7 @@ describe('perm acl', function() {
   })
 
   it('access denied - hard set to false - return allowed fields only', function(done) {
+
     var psi  = si.delegate({perm$:{roles:['item_admin']}})
     var psiList  = si.delegate({perm$:{roles:['test_role']}})
 
@@ -196,14 +197,21 @@ describe('perm acl', function() {
     ;listItem1.save$(function(err,listItem1){
       assert.isNull(err, err)
       assert.isNotNull(listItem1.id)
-  
-    ;listItem2.list$(function(err, publicList) {
-      assert.isNotNull(err, err)
-      assert.isNotNull(publicList)
-      assert.equal(publicList.length,0)
-    }) })
+      
+      ;listItem2.list$(function(err, publicList) {
+        assert.isNull(err, err)
+        assert.isNotNull(publicList)
+        assert.equal(publicList[0].hasOwnProperty('name'), true)
+        assert.equal(publicList[0].hasOwnProperty('number'), true)
+        assert.equal(publicList[0].hasOwnProperty('id'), false)
+        assert.equal(publicList[0].hasOwnProperty('status'), false)
+        assert.equal(publicList.length, 1)
 
-    done()
+        done()
+      }) 
+
+    })
+    
   })
 
   it('entity level access', function(done) {
