@@ -130,7 +130,6 @@ describe('perm acl', function() {
         ]
       }
     ]
-
   })
 
   it('seneca ready', function(done) {
@@ -275,7 +274,6 @@ describe('perm acl', function() {
       assert.isNotNull(pf3.id)
 
     ;pf1.list$(function(err, publicList) {
-      console.log("**** list filtering **** = " + JSON.stringify(publicList))
       assert.isNull(err, err)
       assert.isNotNull(publicList)
       assert.equal(publicList.length, 1, 'permissions should filter out forbidden objects')
