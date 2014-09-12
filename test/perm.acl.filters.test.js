@@ -35,9 +35,9 @@ describe('perm acl', function() {
     }],
     allowedProperties: [{
       entity: {
-      zone: undefined,
-      base: undefined,
-      name: 'item'
+        zone: undefined,
+        base: undefined,
+        name: 'item'
       },
       fields: ['id','name', 'number']
     }]
