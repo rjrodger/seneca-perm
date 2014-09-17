@@ -476,3 +476,14 @@ The above will allow users to only create, read, update or delete 'todo' objects
 ```bash
 mocha test/*.test.js --seneca.log.print
 ```
+
+## Tracing
+
+If you need to trace what seneca-perm is doing you can active DEBUG before running your application:
+
+```
+DEBUG=seneca-perm:* node yourapp.js
+```
+
+
+
