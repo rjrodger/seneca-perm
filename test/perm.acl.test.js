@@ -86,6 +86,7 @@ describe('perm acl', function() {
           base: undefined,
           name: 'item'
         }],
+        hard: true,
         control: 'required',
         actions: ['list', 'load'],
         conditions: [{
@@ -189,7 +190,7 @@ describe('perm acl', function() {
       assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
 
-     
+
       done()
     }) }) }) })
 
@@ -214,7 +215,7 @@ describe('perm acl', function() {
     ;pf1.save$(function(err,pf1){
       assert.isNull(err)
 
-      
+
     done()
     }) }) })
 
@@ -273,11 +274,12 @@ describe('perm acl', function() {
       assert.isNull(err, err)
       assert.isNotNull(pf3.id)
 
+    console.log('LIST PUBLIC NOW')
     ;pf1.list$(function(err, publicList) {
+      console.log('LIST PUBLIC BACK')
       assert.isNull(err, err)
       assert.isNotNull(publicList)
-      assert.equal(publicList.length, 1, 'permissions should filter out forbidden objects')
-
+      assert.equal(publicList.length, 1, 'permissions should filter out forbidden objects: ' + JSON.stringify(publicList))
 
     ;pf2.list$(function(err, privateList) {
 

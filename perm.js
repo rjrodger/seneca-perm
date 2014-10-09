@@ -202,6 +202,7 @@ module.exports = function(options) {
     }
   }
 
+  buildACLs()
 
   globalSeneca.add({init:name}, function(args,done){
 
@@ -221,12 +222,11 @@ module.exports = function(options) {
 
     options.entity = _.isBoolean(options.entity) ? (options.entity ? ['-/-/-'] : []) : (options.entity || [])
 
-    buildACLs()
-
     _.each(options.entity,function( entspec ){
       _.each(cmds,function(cmd){
         entspec = _.isString(entspec) ? globalSeneca.util.parsecanon(entspec) : entspec
         var spec = _.extend({role:'entity',cmd:cmd},entspec)
+
         globalSeneca.add(spec,permcheck)
       })
     })

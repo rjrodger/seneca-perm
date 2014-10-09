@@ -17,7 +17,7 @@ describe('perm acl', function() {
 
   var si = seneca()
 
-  si.use( '../perm.js', {
+  si.use( require('../perm.js'), {
     accessControls: [{
       name: 'access to region attribute',
       roles: ['foobar', 'region'],
