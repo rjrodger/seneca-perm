@@ -274,9 +274,7 @@ describe('perm acl', function() {
       assert.isNull(err, err)
       assert.isNotNull(pf3.id)
 
-    console.log('LIST PUBLIC NOW')
     ;pf1.list$(function(err, publicList) {
-      console.log('LIST PUBLIC BACK')
       assert.isNull(err, err)
       assert.isNotNull(publicList)
       assert.equal(publicList.length, 1, 'permissions should filter out forbidden objects: ' + JSON.stringify(publicList))
