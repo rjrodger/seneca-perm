@@ -8,7 +8,6 @@ var _ = require('lodash')
 var AccessControlProcedure = require('access-controls')
 
 var ACLMicroservicesBuilder = require('./lib/ACLMicroservicesBuilder.js')
-var debug = require('debug')('seneca-perm:perm');
 
 var name = "perm"
 
@@ -130,7 +129,6 @@ module.exports = function(options) {
         return proceed(allow,'act',null,args,prior,done)
       }
       else if(perm.roles) {
-        debug('perm.roles: %s', perm.roles);
 
         var action = getAction(args)
 
