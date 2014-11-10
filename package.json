@@ -27,7 +27,7 @@
     "chai": "1.8.x"
   },
   "dependencies": {
-    "access-controls": "0.4.2",
+    "access-controls": "0.5.0",
     "lodash": "2.4.1"
   },
   "peerDependencies": {
