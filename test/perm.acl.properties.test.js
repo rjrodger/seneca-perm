@@ -82,7 +82,10 @@ describe('perm acl', function() {
   it('access denied - hard set to false - return allowed fields only', function(done) {
 
     var psi  = si.delegate({perm$:{roles:['item_admin']}})
-    var psiList  = si.delegate({perm$:{roles:['test_role']}})
+    var psiList  = si.delegate({
+      perm$:{roles:['test_role']},
+      showSoftDenied$: true
+    })
 
     var listItem1 = psi.make('list_item',{id: 'item1', name: 'Item 1', number: 1, status: 'private'})
     var listItem2 = psiList.make('list_item')
