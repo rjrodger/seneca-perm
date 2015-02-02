@@ -16,7 +16,7 @@ var async   = require('async')
 describe('perm', function() {
 
 
-  it('allow', function(){
+  it('allow', function(fin){
     var si = seneca()
 
     si.add({a:1,b:2},function(args,done){done(null,''+args.a+args.b+args.c)})
@@ -28,60 +28,48 @@ describe('perm', function() {
     ]})
 
 
-    si.ready(function(err){
-      assert.isNull(err)
+    si.ready(function(){
 
-      si.act('a:1,b:2,c:3',function(err,out){
-        assert.isNull(err)
+      ;si.act('a:1,b:2,c:3',function(err,out){
+        assert.ok( null == err )
         assert.equal('123',out)
-      })
 
-      si.act('a:1,b:2,c:3',{perm$:{allow:true}},function(err,out){
-        assert.isNull(err)
+      ;si.act('a:1,b:2,c:3',{perm$:{allow:true}},function(err,out){
+        assert.ok( null == err )
         assert.equal('123',out)
-      })
 
-      si.act('a:1,b:2,c:3',{perm$:{allow:false}},function(err,out){
+      ;si.act('a:1,b:2,c:3',{perm$:{allow:false}},function(err,out){
         assert.isNotNull(err)
         assert.equal('perm/fail/allow',err.seneca.code)
-      })
 
-
-      si.act('a:1,b:2,c:3,d:4',function(err,out){
-        assert.isNull(err)
+      ;si.act('a:1,b:2,c:3,d:4',function(err,out){
+        assert.ok( null == err )
         assert.equal('123',out)
-      })
 
-      si.act('a:1,b:2,c:3,d:4',{perm$:{allow:true}},function(err,out){
-        assert.isNull(err)
+      ;si.act('a:1,b:2,c:3,d:4',{perm$:{allow:true}},function(err,out){
+        assert.ok( null == err )
         assert.equal('123',out)
-      })
 
-      si.act('a:1,b:2,c:3,d:4',{perm$:{allow:false}},function(err,out){
+      ;si.act('a:1,b:2,c:3,d:4',{perm$:{allow:false}},function(err,out){
         assert.isNotNull(err)
         assert.equal('perm/fail/allow',err.seneca.code)
-      })
 
+      ;var act = si.util.router()
+      ;act.add( {a:1,b:2}, true )
 
-      var act = si.util.router()
-      act.add( {a:1,b:2}, true )
-
-      //console.log( act.find({a:1,b:2}) )
-
-      si.act('a:1,b:2,c:3',{perm$:{act:act}},function(err,out){
-        assert.isNull(err)
+      ;si.act('a:1,b:2,c:3',{perm$:{act:act}},function(err,out){
+        assert.ok( null == err )
         assert.equal('123',out)
-      })
 
-      assert.throws(function() {
-        si.act('a:1,c:3',{perm$:{act:act}});
-      })
+        fin();
+
+      }) }) }) }) }) }) })
 
     })
   })
 
 
-  it('entity', function(){
+  it('entity', function(fin){
     var si = seneca()
 
     si.use( '..', {
@@ -92,9 +80,7 @@ describe('perm', function() {
     })
 
 
-    si.ready(function(err){
-      assert.isNull(err)
-
+    si.ready(function(){
 
       var entity = si.util.router()
       entity.add({name:'foo'},'cr')
@@ -109,12 +95,12 @@ describe('perm', function() {
 
 
       ;pf1.save$(function(err,pf1){
-        assert.isNull(err)
+        assert.ok( null == err )
         assert.isNotNull(pf1.id)
         assert.equal(1,pf1.a)
 
       ;pf1.load$(pf1.id,function(err,pf1){
-        assert.isNull(err)
+        assert.ok( null == err )
         assert.isNotNull(pf1.id)
         assert.equal(1,pf1.a)
 
@@ -126,8 +112,10 @@ describe('perm', function() {
 
 
       ;pb1.list$({b:2},function(err,list){
-        assert.isNull(err)
+        assert.ok( null == err )
         assert.equal(2,list[0].b)
+
+        fin();
 
       }) }) }) })
 
@@ -139,7 +127,7 @@ describe('perm', function() {
 
 
 
-  it('entity-boolean', function(){
+  it('entity-boolean', function(fin){
     var si = seneca()
 
     si.use( '..', {
@@ -148,9 +136,7 @@ describe('perm', function() {
     })
 
 
-    si.ready(function(err){
-      assert.isNull(err)
-
+    si.ready(function(){
 
       var entity = si.util.router()
       entity.add({name:'bar'},'rq')
@@ -171,8 +157,10 @@ describe('perm', function() {
 
 
       ;pb1.list$({b:2},function(err,list){
-        assert.isNull(err)
+        assert.ok( null == err )
         assert.equal(2,list[0].b)
+
+        fin();
 
       }) })
 
@@ -180,7 +168,7 @@ describe('perm', function() {
   })
 
 
-  it('owner', function(){
+  it('owner', function(fin){
     var si = seneca()
 
     si.use( '..', {
@@ -190,9 +178,7 @@ describe('perm', function() {
     })
 
 
-    si.ready(function(err){
-      assert.isNull(err)
-      //console.log(si.actroutes())
+    si.ready(function(){
 
       var entity = si.util.router()
       entity.add({name:'foo'},'crudq')
@@ -201,12 +187,12 @@ describe('perm', function() {
       var f1 = os1.make('foo')
       f1.a=1
       f1.save$(function(err,f1){
-        assert.isNull(err)
+        assert.ok( null == err )
         assert.equal(1,f1.a)
         assert.equal('o1',f1.owner)
 
         f1.load$(f1.id,function(err,f1){
-          assert.isNull(err)
+          assert.ok( null == err )
           assert.isNotNull(f1.id)
           assert.equal(1,f1.a)
           assert.equal('o1',f1.owner)
@@ -219,6 +205,8 @@ describe('perm', function() {
             assert.equal('perm/fail/own',err.seneca.code)
             assert.equal('o2',err.seneca.valmap.owner)
             //console.log(err)
+
+            fin();
           })
         })
       })
@@ -226,8 +214,7 @@ describe('perm', function() {
   })
 
 
-  it('makeperm',function(){
-
+  it('makeperm',function(fin){
     var si = seneca()
 
     si.use( '..', {
@@ -242,21 +229,23 @@ describe('perm', function() {
     si.add({b:2},function(args,done){done(null,''+args.b+args.c)})
 
 
-    si.ready(function(err){
+    si.ready(function(){
 
       si.act('role:perm,cmd:makeperm',{perm:{act:[
         {a:1,perm$:true}
       ]}}, function(err,perm){
-        assert.isNull(err)
+        assert.ok( null == err )
 
         si.act('a:1,c:3',{perm$:perm},function(err,out){
-          assert.isNull(err)
+          assert.ok( null == err )
           assert.equal('13',out)
-        })
+          
+          si.act('b:2,c:3',{perm$:perm},function(err,out){
+            assert.isNotNull(err)
+            assert.equal('perm/fail/act',err.seneca.code)
 
-        si.act('b:2,c:3',{perm$:perm},function(err,out){
-          assert.isNotNull(err)
-          assert.equal('perm/fail/act',err.seneca.code)
+            fin()
+          })
         })
       })
     })

@@ -29,9 +29,9 @@ in the [seneca examples repository](https://github.com/rjrodger/seneca-examples)
 If you're using this module, feel free to contact me on twitter if you
 have any questions! :) [@rjrodger](http://twitter.com/rjrodger)
 
-Current Version: 0.1.2
+Current Version: 0.4.0
 
-Tested on: Node 0.10.24, Seneca 0.5.15
+Tested on: Node 0.10.36, Seneca 0.6.1
 
 
 ### Quick example

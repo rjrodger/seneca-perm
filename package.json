@@ -1,6 +1,6 @@
 {
   "name": "seneca-perm",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Seneca permissions plugin",
   "main": "perm.js",
   "scripts": {
@@ -19,7 +19,7 @@
   "author": "Richard Rodger (http://richardrodger.com)",
   "license": "MIT",
   "devDependencies": {
-    "seneca": "0.5.17",
+    "seneca": "plugin",
     "connect": "2.12.x",
     "mocha": "1.17.x",
     "gex": "0.1.x",
@@ -27,10 +27,7 @@
     "chai": "1.8.x"
   },
   "dependencies": {
-    "access-controls": "0.5.2",
-    "lodash": "2.4.1"
-  },
-  "peerDependencies": {
-    "seneca": "*"
+    "access-controls": "~0.5.2",
+    "lodash": "~2.4.1"
   }
 }

@@ -189,8 +189,6 @@ describe('perm acl', function() {
       assert.ok(err, 'expected a permission denied error but did not get any')
       assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
-
-
       done()
     }) }) }) })
 
