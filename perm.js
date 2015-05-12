@@ -353,9 +353,6 @@ module.exports = function(options) {
   }
 
 
-  globalSeneca.act({role:'web',use:service})
-
-
   return {
     name:name,
     exports:{
