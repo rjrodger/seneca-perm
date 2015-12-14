@@ -5,7 +5,7 @@
   "main": "perm.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha test/*.test.js --reporter spec",
-    "cover": "istanbul report text-summary lcov && cat coverage/lcov.info | coveralls"
+    "cover": "istanbul report text-summary lcov ; cat coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",

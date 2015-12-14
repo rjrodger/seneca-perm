@@ -1,10 +1,12 @@
-[![Build Status](https://api.travis-ci.org/rjrodger/seneca-perm.png?branch=master)](https://travis-ci.org/rjrodger/seneca-perm)
-
 # seneca-perm
+
+[![npm version](https://badge.fury.io/js/jade-static.svg)](https://badge.fury.io/js/jade-static)
+[![Build Status](https://api.travis-ci.org/rjrodger/seneca-perm.png?branch=master)](https://travis-ci.org/rjrodger/seneca-perm)
+[![Coverage Status](https://coveralls.io/repos/rjrodger/seneca-perm/badge.svg?branch=master&service=github)](https://coveralls.io/github/rjrodger/seneca-perm?branch=master)
 
 ### Node.js Seneca permissions module
 
-This module is a plugin for the Seneca framework. It provides a
+This module is a plugin for the [Seneca framework](http://senecajs.org/). It provides a
 permissions system for actions. It's also a good example of how you can compose actions by layering plugins onto each other.
 
 This plugin works by wrapping existing actions with a permission checking action. If the permission test passes, the parent
@@ -23,16 +25,10 @@ the req.seneca object if it exists.
 A full example, in the context of the seneca data editor, is provided
 in the [seneca examples repository](https://github.com/rjrodger/seneca-examples). TODO!
 
-
 ### Support
 
 If you're using this module, feel free to contact me on twitter if you
 have any questions! :) [@rjrodger](http://twitter.com/rjrodger)
-
-Current Version: 0.4.0
-
-Tested on: Node 0.10.36, Seneca 0.6.1
-
 
 ### Quick example
 
