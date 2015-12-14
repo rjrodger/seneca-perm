@@ -4,7 +4,8 @@
   "description": "Seneca permissions plugin",
   "main": "perm.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test/*.test.js --reporter spec"
+    "test": "./node_modules/mocha/bin/mocha test/*.test.js --reporter spec",
+    "cover": "istanbul report text-summary lcov && cat coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -19,12 +20,14 @@
   "author": "Richard Rodger (http://richardrodger.com)",
   "license": "MIT",
   "devDependencies": {
-    "seneca": "plugin",
-    "connect": "2.12.x",
-    "mocha": "1.17.x",
-    "gex": "0.1.x",
     "async": "0.2.x",
-    "chai": "1.8.x"
+    "chai": "1.8.x",
+    "connect": "2.12.x",
+    "coveralls": "^2.11.6",
+    "gex": "0.1.x",
+    "istanbul": "^0.4.1",
+    "mocha": "1.17.x",
+    "seneca": "plugin"
   },
   "dependencies": {
     "access-controls": "~0.5.2",
