@@ -1,10 +1,10 @@
+![Seneca](http://senecajs.org/files/assets/seneca-logo.png)
+> A [Seneca.js](http://senecajs.org) permissions plugin
+
 # seneca-perm
-
-[![npm version](https://badge.fury.io/js/jade-static.svg)](https://badge.fury.io/js/jade-static)
-[![Build Status](https://api.travis-ci.org/rjrodger/seneca-perm.png?branch=master)](https://travis-ci.org/rjrodger/seneca-perm)
-[![Coverage Status](https://coveralls.io/repos/rjrodger/seneca-perm/badge.svg?branch=master&service=github)](https://coveralls.io/github/rjrodger/seneca-perm?branch=master)
-
-### Node.js Seneca permissions module
+[![npm version][npm-badge]][npm-url]
+[![Build Status][travis-badge]][travis-url]
+[![Coverage Status][coveralls-badge]][coveralls-status]
 
 This module is a plugin for the [Seneca framework](http://senecajs.org/). It provides a
 permissions system for actions. It's also a good example of how you can compose actions by layering plugins onto each other.
@@ -481,5 +481,9 @@ If you need to trace what seneca-perm is doing you can active DEBUG before runni
 DEBUG=seneca-perm:* node yourapp.js
 ```
 
-
-
+[npm-badge]: https://badge.fury.io/js/seneca-perm.svg
+[npm-url]: https://badge.fury.io/js/seneca-perm
+[travis-badge]: https://api.travis-ci.org/rjrodger/seneca-perm.svg
+[travis-url]: https://travis-ci.org/rjrodger/seneca-perm
+[coveralls-badge]:https://coveralls.io/repos/rjrodger/seneca-perm/badge.svg?branch=master&service=github
+[coveralls-url]: https://coveralls.io/github/rjrodger/seneca-perm?branch=master
