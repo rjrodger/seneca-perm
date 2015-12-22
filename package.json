@@ -20,17 +20,17 @@
   "author": "Richard Rodger (http://richardrodger.com)",
   "license": "MIT",
   "devDependencies": {
-    "async": "0.2.x",
-    "chai": "1.8.x",
-    "connect": "2.12.x",
+    "async": "1.5.x",
+    "chai": "3.4.x",
+    "connect": "3.4.x",
     "coveralls": "^2.11.6",
-    "gex": "0.1.x",
+    "gex": "0.2.x",
     "istanbul": "^0.4.1",
-    "mocha": "1.17.x",
+    "mocha": "2.3.x",
     "seneca": "plugin"
   },
   "dependencies": {
     "access-controls": "~0.5.2",
-    "lodash": "~2.4.1"
+    "lodash": "~3.10.1"
   }
 }
