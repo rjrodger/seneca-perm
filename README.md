@@ -4,7 +4,9 @@
 # seneca-perm
 [![npm version][npm-badge]][npm-url]
 [![Build Status][travis-badge]][travis-url]
-[![Coverage Status][coveralls-badge]][coveralls-status]
+[![Coverage Status][coveralls-badge]][coveralls-url]
+[![Dependency Status][david-badge]][david-url]
+[![Gitter chat][gitter-badge]][gitter-url]
 
 This module is a plugin for the [Seneca framework](http://senecajs.org/). It provides a
 permissions system for actions. It's also a good example of how you can compose actions by layering plugins onto each other.
@@ -487,3 +489,7 @@ DEBUG=seneca-perm:* node yourapp.js
 [travis-url]: https://travis-ci.org/rjrodger/seneca-perm
 [coveralls-badge]:https://coveralls.io/repos/rjrodger/seneca-perm/badge.svg?branch=master&service=github
 [coveralls-url]: https://coveralls.io/github/rjrodger/seneca-perm?branch=master
+[david-badge]: https://david-dm.org/senecajs/seneca-auth.svg
+[david-url]: https://david-dm.org/senecajs/seneca-auth
+[gitter-badge]: https://badges.gitter.im/senecajs/seneca.png
+[gitter-url]: https://gitter.im/senecajs/seneca
