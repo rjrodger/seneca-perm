@@ -5,7 +5,7 @@ var _ = require('lodash')
 
 // var AccessControlProcedure = require('access-controls')
 
-var ACLMicroservicesBuilder = require('./lib/ACLMicroservicesBuilder.js')
+var ACLMicroservicesBuilder = require('./lib/acl-microservices-builder.js')
 
 var name = 'perm'
 

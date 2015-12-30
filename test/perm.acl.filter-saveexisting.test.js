@@ -13,108 +13,111 @@ var expect = Code.expect
 var testopts = { log: 'silent' }
 
 describe('perm acl', function () {
-  var si = seneca(testopts)
+  describe('filter-save existing', function () {
+    var si = seneca(testopts)
 
-  si.use( require('../perm.js'), {
-    accessControls: [
-      {
-        name: 'cannot save changes to happy attribute if it\'s already happy',
-        roles: ['foobar', 'happy'],
-        entities: [{
-          zone: undefined,
-          base: undefined,
-          name: 'foobar'
-        }],
-        control: 'filter',
-        actions: ['save_new', 'save_existing'],
-        conditions: [{
-          attributes: {
-            happy: 1
+    si.use(require('../perm.js'), {
+      accessControls: [
+        {
+          name: 'cannot save changes to happy attribute if it\'s already happy',
+          roles: ['foobar', 'happy'],
+          entities: [{
+            zone: undefined,
+            base: undefined,
+            name: 'foobar'
+          }],
+          control: 'filter',
+          actions: ['save_new', 'save_existing'],
+          conditions: [{
+            attributes: {
+              happy: 1
+            }
+          }],
+          filters: {
+            happy: false
           }
-        }],
-        filters: {
-          happy: false
+        },
+        {
+          name: 'access to foobars',
+          roles: ['foobar'],
+          entities: [{
+            zone: undefined,
+            base: undefined,
+            name: 'foobar'
+          }],
+          control: 'required',
+          actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
+          conditions: []
         }
-      },
-      {
-        name: 'access to foobars',
-        roles: ['foobar'],
-        entities: [{
+      ],
+      allowedProperties: [{
+        entity: {
           zone: undefined,
           base: undefined,
           name: 'foobar'
-        }],
-        control: 'required',
-        actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
-        conditions: []
-      }
-    ],
-    allowedProperties: [{
-      entity: {
-        zone: undefined,
-        base: undefined,
-        name: 'foobar'
-      },
-      fields: ['id', 'name', 'number', 'happy', 'tacos']
-    }]
-  })
-
-  it('seneca ready', function (done) {
-    this.timeout(10000)
-    si.ready(done)
-  })
-
-  // worked before this test.
-  it('[save_new] filters should apply to conditional property.', function (done) {
-    var psiNoHappy = si.delegate({perm$: {roles: ['foobar']}})
-
-    var e = psiNoHappy.make('foobar', {a: 'a', happy: 1})
-
-    e.save$(function (err, e) {
-      expect(err).to.not.exist()
-      expect(e).to.exist()
-      expect(e.happy).to.be.undefined('should not have saved change to happy property') // FIXME
-
-      done()
+        },
+        fields: ['id', 'name', 'number', 'happy', 'tacos']
+      }]
     })
-  })
 
-  it('[save_existing] filters should apply to conditional property.', function (done) {
-    var psi = si.delegate({perm$: {roles: ['foobar', 'happy']}})
-    var psiNoHappy = si.delegate({perm$: {roles: ['foobar']}})
+    it('seneca ready', {timeout: 10000}, function (done) {
+      si.ready(done)
+    })
 
-    var pf1 = psi.make('foobar', {a: 'a', happy: 1})
-    var pf1NoHappy = psiNoHappy.make('foobar', {b: 'b', happy: 1})
+    // worked before this test.
+    it('[save_new] filters should apply to conditional property.', function (done) {
+      var psiNoHappy = si.delegate({perm$: {roles: ['foobar']}})
 
-    pf1.save$(function (err, pf1) {
-      expect(err).to.not.exist()
-      console.log('saved ', pf1)
+      var e = psiNoHappy.make('foobar', {a: 'a', happy: 1})
 
-      expect(pf1.id).to.exist()
-      expect(pf1.happy).to.equal(1)
-
-      pf1NoHappy.load$(pf1.id, function (err, pf1NoHappy) {
+      e.save$(function (err, e) {
         expect(err).to.not.exist()
-        expect(pf1NoHappy).to.exist()
-        expect(pf1NoHappy.happy).to.equal(1) // 'should not have saved change to happy property')
+        expect(e).to.exist()
+        expect(e.happy).to.be.undefined('should not have saved change to happy property') // FIXME
 
-        console.log('loaded happy entity', pf1NoHappy)
+        done()
+      })
+    })
 
-        pf1NoHappy.tacos = 'yum'
-        pf1NoHappy.happy = 0
-        console.log('====================================++>>>>>>')
-        console.log('attempting to make happy entity unhappy', pf1NoHappy)
+    it('[save_existing] filters should apply to conditional property.', function (done) {
+      var psi = si.delegate({perm$: {roles: ['foobar', 'happy']}})
+      var psiNoHappy = si.delegate({perm$: {roles: ['foobar']}})
 
-        pf1NoHappy.save$(function (err, pf1NoHappy) {
-          if (!pf1NoHappy.happy) console.log('happy entity shouldnt be unhappy!', pf1NoHappy)
-          else console.log('yay still happy!')
+      var pf1 = psi.make('foobar', {a: 'a', happy: 1})
+      var pf1NoHappy = psiNoHappy.make('foobar', {b: 'b', happy: 1})
 
+      pf1.save$(function (err, pf1) {
+        expect(err).to.not.exist()
+        console.log('saved ', pf1)
+
+        expect(pf1.id).to.exist()
+        expect(pf1.happy).to.equal(1)
+
+        pf1NoHappy.load$(pf1.id, function (err, pf1NoHappy) {
           expect(err).to.not.exist()
           expect(pf1NoHappy).to.exist()
           expect(pf1NoHappy.happy).to.equal(1) // 'should not have saved change to happy property')
-          expect(pf1NoHappy.tacos).to.equal('yum') // 'should have saved new tacos property')
 
-          done()
-        }) }) })
+          console.log('loaded happy entity', pf1NoHappy)
+
+          pf1NoHappy.tacos = 'yum'
+          pf1NoHappy.happy = 0
+          console.log('====================================++>>>>>>')
+          console.log('attempting to make happy entity unhappy', pf1NoHappy)
+
+          pf1NoHappy.save$(function (err, pf1NoHappy) {
+            if (!pf1NoHappy.happy) console.log('happy entity shouldnt be unhappy!', pf1NoHappy)
+            else console.log('yay still happy!')
+
+            expect(err).to.not.exist()
+            expect(pf1NoHappy).to.exist()
+            expect(pf1NoHappy.happy).to.equal(1) // 'should not have saved change to happy property')
+            expect(pf1NoHappy.tacos).to.equal('yum') // 'should have saved new tacos property')
+
+            done()
+          })
+        })
+      })
+    })
   })
 })

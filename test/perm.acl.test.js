@@ -133,7 +133,7 @@ describe('perm acl', function () {
     ]
   })
 
-  it('seneca ready', function (done) {
+  it('seneca ready', {timeout: 10000}, function (done) {
     si.ready(done)
   })
 

@@ -84,7 +84,7 @@ action, and shows you how to trigger it manually, using the _perm$_ argument.
 
 
 ```JavaScript
-var seneca  = require('seneca')()
+var seneca  = require(Seneca)()
 seneca.use('echo')
 
 seneca.use( 'perm', {act:[
@@ -115,7 +115,7 @@ Here's an outline of how you would use it in a
 _auth_ plugins to provide user accounts:
 
 ```JavaScript
-var seneca  = require('seneca')()
+var seneca  = require(Seneca)()
 var connect = require('connect')
 
 seneca.use('user')

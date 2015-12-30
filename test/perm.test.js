@@ -1,7 +1,7 @@
 /* Copyright (c) 2013-2014 Richard Rodger */
-"use strict";
+'use strict'
 
-var seneca  = require('seneca')
+var Seneca = require('seneca')
 
 var Lab = require('lab')
 var Code = require('code')
@@ -11,28 +11,26 @@ var describe = lab.describe
 var it = lab.it
 var expect = Code.expect
 
-var gex     = require('gex')
-var async   = require('async')
-
 var testopts = { log: 'silent' }
 
+describe('perm', function () {
+  it('allow', function (done) {
+    var si = Seneca(testopts)
 
-describe('perm', function() {
-
-  it('allow', function(done){
-    var si = seneca(testopts)
-
-    si.add({a:1,b:2},function(args,done){done(null,''+args.a+args.b+args.c)})
-
-
-    si.use( '..', {act:[
-      {a:1,b:2},
-      {a:1,b:2,d:4}
-    ]})
+    si.add({a: 1, b: 2}, function (args, done) {
+      done(null, '' + args.a + args.b + args.c)
+    })
 
 
-    si.ready(function(){
+    si.use('..', {
+      act: [
+        {a: 1, b: 2},
+        {a: 1, b: 2, d: 4}
+      ]
+    })
 
+
+    si.ready(function () {
       si.act('a:1,b:2,c:3', function (err, out) {
         expect(err).to.not.exist()
         expect(out).to.equal('123')
@@ -64,36 +62,32 @@ describe('perm', function() {
                     expect(err).to.not.exist()
                     expect(out).to.equal('123')
 
-                    done();
-
+                    done()
                   }) }) }) }) }) })
       })
-
     })
   })
 
-
-  it('entity', function(done) {
-    var si = seneca(testopts)
+  it('entity', function (done) {
+    var si = Seneca(testopts)
 
     si.use( '..', {
-      entity:[
-        {name:'foo'},
+      entity: [
+        {name: 'foo'},
         'bar'
       ]
     })
 
 
-    si.ready(function(testopts){
-
+    si.ready(function (testopts) {
       var entity = si.util.router()
-      entity.add({name:'foo'},'cr')
-      entity.add({name:'bar'},'rq')
+      entity.add({name: 'foo'}, 'cr')
+      entity.add({name: 'bar'}, 'rq')
 
-      var b1 = si.make('bar',{b:2}).save$()
+      var b1 = si.make('bar', {b: 2}).save$()
 
-      var psi = si.delegate({perm$:{entity:entity}})
-      var pf1 = psi.make('foo',{a:1})
+      var psi = si.delegate({perm$: {entity: entity}})
+      var pf1 = psi.make('foo', {a: 1})
       var pb1 = psi.make('bar')
 
       pf1.save$(function (err, pf1) {
@@ -117,36 +111,29 @@ describe('perm', function() {
               expect(err).to.not.exist()
               expect(list[0].b).to.equal(2)
 
-              done();
-
-      }) }) }) })
-
+              done()
+            }) }) }) })
     })
-
   })
 
   // TODO: test all ent cmds
 
-
-
-  it('entity-boolean', function(done){
-    var si = seneca(testopts)
+  it('entity-boolean', function (done) {
+    var si = Seneca(testopts)
 
     si.use( '..', {
       // apply perm check to all entities
-      entity:true
+      entity: true
     })
 
-
-    si.ready(function(){
-
+    si.ready(function () {
       var entity = si.util.router()
-      entity.add({name:'bar'},'rq')
+      entity.add({name: 'bar'}, 'rq')
 
-      var f1 = si.make('foo',{a:1}).save$()
-      var b1 = si.make('bar',{b:2}).save$()
+      var f1 = si.make('foo', {a: 1}).save$()
+      var b1 = si.make('bar', {b: 2}).save$()
 
-      var psi = si.delegate({perm$:{entity:entity}})
+      var psi = si.delegate({perm$: {entity: entity}})
 
       var pf1 = psi.make('foo')
       var pb1 = psi.make('bar')
@@ -160,88 +147,47 @@ describe('perm', function() {
           expect(err).to.not.exist()
           expect(list[0].b).to.equal(2)
 
-          done();
-
-      }) })
-
+          done()
+        }) })
     })
   })
 
-
-  it('owner', function(done){
-    var si = seneca(testopts)
+  it('owner', function (done) {
+    var si = Seneca(testopts)
 
     si.use( '..', {
-      own:[
-        {name:'foo'}
+      own: [
+        {name: 'foo'}
       ]
     })
 
 
-    si.ready(function(){
-
+    si.ready(function () {
       var entity = si.util.router()
-      entity.add({name:'foo'},'crudq')
+      entity.add({name: 'foo'}, 'crudq')
 
-      var os1 = si.delegate({perm$:{own:{entity:entity,owner:'o1'}}})
+      var os1 = si.delegate({perm$: {own: {entity: entity, owner: 'o1'}}})
       var f1 = os1.make('foo')
-      f1.a=1
-      f1.save$(function(err,f1){
+      f1.a = 1
+      f1.save$(function (err, f1) {
         expect(err).to.not.exist()
         expect(f1.a).to.equal(1)
         expect(f1.owner).to.equal('o1')
 
-        f1.load$(f1.id,function(err,f1){
+        f1.load$(f1.id, function (err, f1) {
           expect(err).to.not.exist()
           expect(f1.id).to.exist()
           expect(f1.a).to.equal(1)
           expect(f1.owner).to.equal('o1')
 
-          var os2 = si.delegate({perm$:{own:{entity:entity,owner:'o2'}}})
+          var os2 = si.delegate({perm$: {own: {entity: entity, owner: 'o2'}}})
           var f2 = os2.make('foo')
 
-          f2.load$(f1.id,function(err,f2o){
+          f2.load$(f1.id, function (err, f2o) {
             expect(err).to.exist()
             expect(err.seneca.code).to.equal('perm/fail/own')
             expect(err.seneca.valmap.owner).to.equal('o2')
-            //console.log(err)
-
-            done();
-          })
-        })
-      })
-    })
-  })
-
-
-  it('makeperm',function(done){
-    var si = seneca(testopts)
-
-    si.use( '..', {
-      act:[
-        {a:1},
-        {b:2},
-      ]
-    })
-    
-    si.add({a:1},function(args,done){done(null,''+args.a+args.c)})
-    si.add({b:2},function(args,done){done(null,''+args.b+args.c)})
-
-
-    si.ready(function(){
-
-      si.act('role:perm,cmd:makeperm',
-          { perm: { act: [{a: 1,perm$: true}] } }, function(err,perm){
-        
-        expect(err).to.not.exist()
-
-        si.act('a:1,c:3',{perm$:perm},function(err,out){
-          expect(err).to.not.exist()
-          expect(out).to.equal('13')
-          
-          si.act('b:2,c:3',{perm$:perm},function(err,out){
-            expect(err).to.exist()
-            expect(err.seneca.code).to.equal('perm/fail/act')
+            // console.log(err)
 
             done()
           })
@@ -250,4 +196,43 @@ describe('perm', function() {
     })
   })
 
+
+  it('makeperm', function (done) {
+    var si = Seneca(testopts)
+
+    si.use('..', {
+      act: [
+        {a: 1},
+        {b: 2}
+      ]
+    })
+
+    si.add({a: 1}, function (args, done) {
+      done(null, '' + args.a + args.c)
+    })
+    si.add({b: 2}, function (args, done) {
+      done(null, '' + args.b + args.c)
+    })
+
+
+    si.ready(function () {
+      si.act('role:perm,cmd:makeperm',
+        {perm: {act: [{a: 1, perm$: true}]}},
+        function (err, perm) {
+          expect(err).to.not.exist()
+
+          si.act('a:1,c:3', {perm$: perm}, function (err, out) {
+            expect(err).to.not.exist()
+            expect(out).to.equal('13')
+
+            si.act('b:2,c:3', {perm$: perm}, function (err, out) {
+              expect(err).to.exist()
+              expect(err.seneca.code).to.equal('perm/fail/act')
+
+              done()
+            })
+          })
+        })
+    })
+  })
 })
