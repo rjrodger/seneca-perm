@@ -17,9 +17,9 @@ var error = require('eraro')({
 
 
 module.exports = function (options) {
-  var globalSeneca = this
+  var seneca = this
 
-  var aclBuilder = new ACLMicroservicesBuilder(globalSeneca)
+  var aclBuilder = new ACLMicroservicesBuilder(seneca)
 
   options = this.util.deepextend({
     status: {
@@ -32,7 +32,7 @@ module.exports = function (options) {
     if (options.accessControls) {
       var allowedProperties = buildPropertiesMap(options.allowedProperties)
       aclBuilder.register(options.accessControls, allowedProperties)
-      aclBuilder.augmentSeneca(globalSeneca)
+      aclBuilder.augmentSeneca(seneca)
     }
   }
 
@@ -171,7 +171,7 @@ module.exports = function (options) {
           }
 
           if (id) {
-            var checkent = globalSeneca.make(ent.canon$({object$: true}))
+            var checkent = seneca.make(ent.canon$({object$: true}))
             checkent.load$(id, function (err, existing) {
               if (err) return respond(err)
 
@@ -209,15 +209,15 @@ module.exports = function (options) {
 
   buildACLs()
 
-  globalSeneca.add({init: name}, function (args, respond) {
+  seneca.add({init: name}, function (args, respond) {
     if (_.isBoolean(options.act) && options.act) {
-      _.each(globalSeneca.list(), function (act) {
-        globalSeneca.add(act, permcheck)
+      _.each(seneca.list(), function (act) {
+        seneca.add(act, permcheck)
       })
     }
     else if (_.isArray(options.act)) {
       _.each(options.act, function (pin) {
-        globalSeneca.add(pin, permcheck)
+        seneca.add(pin, permcheck)
       })
     }
 
@@ -227,10 +227,10 @@ module.exports = function (options) {
 
     _.each(options.entity, function (entspec) {
       _.each(cmds, function (cmd) {
-        entspec = _.isString(entspec) ? globalSeneca.util.parsecanon(entspec) : entspec
+        entspec = _.isString(entspec) ? seneca.util.parsecanon(entspec) : entspec
         var spec = _.extend({role: 'entity', cmd: cmd}, entspec)
 
-        globalSeneca.add(spec, permcheck)
+        seneca.add(spec, permcheck)
       })
     })
 
@@ -238,9 +238,9 @@ module.exports = function (options) {
 
     _.each(options.own, function (entspec) {
       _.each(cmds, function (cmd) {
-        entspec = _.isString(entspec) ? globalSeneca.util.parsecanon(entspec) : entspec
+        entspec = _.isString(entspec) ? seneca.util.parsecanon(entspec) : entspec
         var spec = _.extend({role: 'entity', cmd: cmd}, entspec)
-        globalSeneca.add(spec, permcheck)
+        seneca.add(spec, permcheck)
       })
     })
 
@@ -269,7 +269,7 @@ module.exports = function (options) {
 
 
     function make_router (permspec, name) {
-      var router = globalSeneca.util.router()
+      var router = seneca.util.router()
 
       var pinspec = permspec[name]
       if (_.isArray(pinspec)) {
@@ -279,13 +279,13 @@ module.exports = function (options) {
           }
 
           var opspec = entry.perm$
-          var typespec = globalSeneca.util.clean(_.clone(entry))
+          var typespec = seneca.util.clean(_.clone(entry))
           router.add(typespec, opspec)
         })
       }
       else if (_.isObject(pinspec) && ('entity' === name || 'own' === name)) {
         _.each(pinspec, function (perm$, canonstr) {
-          router.add(globalSeneca.util.parsecanon(canonstr), perm$)
+          router.add(seneca.util.parsecanon(canonstr), perm$)
         })
       }
 
@@ -317,7 +317,7 @@ module.exports = function (options) {
   var nilperm = makeperm({})
   var anonperm = makeperm(options.anon)
 
-  globalSeneca.add({role: name, cmd: 'makeperm'}, function (args, respond) {
+  seneca.add({role: name, cmd: 'makeperm'}, function (args, respond) {
     var perm = makeperm(args.perm)
     respond(null, perm)
   })
