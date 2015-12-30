@@ -65,15 +65,15 @@ module.exports = function (options) {
 
   var denied = options.status.denied
 
-  function proceed (allow, type, meta, args, parent, done) {
+  function proceed (allow, type, meta, args, parent, respond) {
     if (!allow) {
-      return done(globalSeneca.fail(_.extend({}, meta || {}, {
+      return respond(globalSeneca.fail(_.extend({}, meta || {}, {
         code: 'perm/fail/' + type,
         args: args,
         status: denied
       })))
     }
-    parent(args, done)
+    parent(args, respond)
   }
 
   function allow_ent_op (args, opspec) {
@@ -107,11 +107,11 @@ module.exports = function (options) {
     return (entityDef.zone || '-') + '/' + (entityDef.base || '-') + '/' + entityDef.name
   }
 
-  function permcheck (args, done) {
+  function permcheck (args, respond) {
     var seneca = this
     var prior = this.prior
     if (!prior) {
-      return done(seneca.fail({code: 'perm/no-prior', args: args}))
+      return respond(seneca.fail({code: 'perm/no-prior', args: args}))
     }
 
     var perm = args.perm$
@@ -121,11 +121,11 @@ module.exports = function (options) {
     //         either all checks grant permission or one of them denies it
     if (perm) {
       if (_.isBoolean(perm.allow)) {
-        return proceed(perm.allow, 'allow', null, args, prior, done)
+        return proceed(perm.allow, 'allow', null, args, prior, respond)
       }
       else if (perm.act) {
         var allow = !!perm.act.find(args)
-        return proceed(allow, 'act', null, args, prior, done)
+        return proceed(allow, 'act', null, args, prior, respond)
       }
       else if (perm.roles) {
         // FIXME
@@ -136,13 +136,13 @@ module.exports = function (options) {
           base: args.base,
           name: args.name
         }
-        acls.executePermissions(seneca, args, prior, done)
+        acls.executePermissions(seneca, args, prior, respond)
       }
       else if (perm.entity) {
         var opspec = perm.entity.find(args)
 
         var result = allow_ent_op(args, opspec)
-        return proceed(result.allow, 'entity/operation', {allowed: opspec, need: result.need}, args, prior, done)
+        return proceed(result.allow, 'entity/operation', {allowed: opspec, need: result.need}, args, prior, respond)
       }
       else if (perm.own) {
         var opspec = perm.own.entity.find(args)
@@ -150,7 +150,7 @@ module.exports = function (options) {
         var result = allow_ent_op(args, opspec)
 
         if (!result.allow) {
-          return done(seneca.fail({
+          return respond(seneca.fail({
             code: 'perm/fail/own',
             allowed: opspec,
             need: result.need,
@@ -172,13 +172,13 @@ module.exports = function (options) {
           if (id) {
             var checkent = globalSeneca.make(ent.canon$({object$: true}))
             checkent.load$(id, function (err, existing) {
-              if (err) return done(err)
+              if (err) return respond(err)
 
               if (existing && existing.owner !== owner) {
-                return done(globalSeneca.fail({code: 'perm/fail/own', owner: owner, args: args, status: denied}))
+                return respond(globalSeneca.fail({code: 'perm/fail/own', owner: owner, args: args, status: denied}))
               }
 
-              return prior(args, done)
+              return prior(args, respond)
             })
           }
           else {
@@ -187,27 +187,27 @@ module.exports = function (options) {
               args.q.owner = owner
             }
             ent.owner = owner
-            return prior(args, done)
+            return prior(args, respond)
           }
         }
         else {
           args.q.owner = owner
-          return prior(args, done)
+          return prior(args, respond)
         }
       }
-      else return done(seneca.fail({code: 'perm/no-match', args: args}))
+      else return respond(seneca.fail({code: 'perm/no-match', args: args}))
     }
 
     // need an explicit perm$ arg to trigger a permcheck
     // this allows internal operations to proceed as normal
     else {
-      return prior(args,done)
+      return prior(args,respond)
     }
   }
 
   buildACLs()
 
-  globalSeneca.add({init: name}, function (args, done) {
+  globalSeneca.add({init: name}, function (args, respond) {
 
     if (_.isBoolean(options.act) && options.act) {
       _.each(globalSeneca.list(), function (act) {
@@ -243,7 +243,7 @@ module.exports = function (options) {
       })
     })
 
-    done()
+    respond()
   })
 
   function makeperm(permspec) {
@@ -316,9 +316,9 @@ module.exports = function (options) {
   var nilperm = makeperm({})
   var anonperm = makeperm(options.anon)
 
-  globalSeneca.add({role: name, cmd: 'makeperm'}, function (args, done) {
+  globalSeneca.add({role: name, cmd: 'makeperm'}, function (args, respond) {
     var perm = makeperm(args.perm)
-    done(null, perm)
+    respond(null, perm)
   })
 
   function service (req, res, next) {
