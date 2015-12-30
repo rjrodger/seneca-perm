@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "access-controls": "~0.5.2",
+    "eraro": "^0.4.1",
     "lodash": "~3.10.1"
   }
 }

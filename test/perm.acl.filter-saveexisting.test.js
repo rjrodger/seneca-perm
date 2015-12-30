@@ -73,7 +73,7 @@ describe('perm acl', function () {
       e.save$(function (err, e) {
         expect(err).to.not.exist()
         expect(e).to.exist()
-        expect(e.happy).to.be.undefined('should not have saved change to happy property') // FIXME
+        expect(e.happy).to.be.undefined() // 'should not have saved change to happy property') // FIXME
 
         done()
       })

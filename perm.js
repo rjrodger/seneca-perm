@@ -8,6 +8,9 @@ var _ = require('lodash')
 var ACLMicroservicesBuilder = require('./lib/acl-microservices-builder.js')
 
 var name = 'perm'
+var error = require('eraro')({
+  package: name
+})
 
 
 // TODO: should be able to dynamically add perms so they can be used from custom plugins
@@ -67,11 +70,10 @@ module.exports = function (options) {
 
   function proceed (allow, type, meta, args, parent, respond) {
     if (!allow) {
-      return respond(globalSeneca.fail(_.extend({}, meta || {}, {
-        code: 'perm/fail/' + type,
+      return respond(error('perm/fail/' + type, 'Not Allowed.', {
         args: args,
         status: denied
-      })))
+      }))
     }
     parent(args, respond)
   }
@@ -111,7 +113,7 @@ module.exports = function (options) {
     var seneca = this
     var prior = this.prior
     if (!prior) {
-      return respond(seneca.fail({code: 'perm/no-prior', args: args}))
+      return respond(error('perm/no-prior', 'Prior does not exist', {args: args}))
     }
 
     var perm = args.perm$
@@ -150,8 +152,7 @@ module.exports = function (options) {
         var result = allow_ent_op(args, opspec)
 
         if (!result.allow) {
-          return respond(seneca.fail({
-            code: 'perm/fail/own',
+          return respond(error('perm/fail/own', 'not allowed', {
             allowed: opspec,
             need: result.need,
             args: args,
@@ -175,7 +176,8 @@ module.exports = function (options) {
               if (err) return respond(err)
 
               if (existing && existing.owner !== owner) {
-                return respond(globalSeneca.fail({code: 'perm/fail/own', owner: owner, args: args, status: denied}))
+                return respond(error('perm/fail/own', 'Not owner of the resource',
+                  {owner: owner, args: args, status: denied}))
               }
 
               return prior(args, respond)
@@ -195,7 +197,7 @@ module.exports = function (options) {
           return prior(args, respond)
         }
       }
-      else return respond(seneca.fail({code: 'perm/no-match', args: args}))
+      else return respond(error('perm/no-match', 'Permission don not match', {args: args}))
     }
 
     // need an explicit perm$ arg to trigger a permcheck
@@ -208,7 +210,6 @@ module.exports = function (options) {
   buildACLs()
 
   globalSeneca.add({init: name}, function (args, respond) {
-
     if (_.isBoolean(options.act) && options.act) {
       _.each(globalSeneca.list(), function (act) {
         globalSeneca.add(act, permcheck)
@@ -246,7 +247,7 @@ module.exports = function (options) {
     respond()
   })
 
-  function makeperm(permspec) {
+  function makeperm (permspec) {
     if (permspec.ready) {
       return permspec
     }
@@ -274,7 +275,7 @@ module.exports = function (options) {
       if (_.isArray(pinspec)) {
         _.each(pinspec, function (entry) {
           if (_.isUndefined(entry.perm$)) {
-            throw globalSeneca.fail({code: 'perm/no-perm-defined', entry: entry})
+            throw error('perm/no-perm-defined', 'No permission was defined', {entry: entry})
           }
 
           var opspec = entry.perm$
