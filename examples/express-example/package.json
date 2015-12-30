@@ -14,7 +14,6 @@
     "seneca-auth": "0.2.7",
     "seneca-account": "0.1.4",
     "seneca": "0.5.12",
-    "underscore": "1.5.1",
     "express": "3.3.5"
   }
 }

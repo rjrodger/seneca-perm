@@ -5,7 +5,7 @@
   "main": "perm.js",
   "scripts": {
     "cov": "lab -s -P test -r lcov | coveralls",
-    "test": "lab -v -P test -L -t 80",
+    "test": "lab -v -P test -t 80",
     "lint": "lab -P test -dL"
   },
   "repository": {
@@ -26,6 +26,7 @@
     "code": "^1.5.0",
     "connect": "3.4.x",
     "coveralls": "^2.11.6",
+    "eslint-config-seneca": "^1.1.2",
     "gex": "0.2.x",
     "istanbul": "^0.4.1",
     "lab": "^6.2.0",

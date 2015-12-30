@@ -1,7 +1,7 @@
 /* Copyright (c) 2013-2014 Richard Rodger */
-"use strict";
+'use strict'
 
-var seneca  = require('seneca')
+var seneca = require('seneca')
 
 var Lab = require('lab')
 var Code = require('code')
@@ -11,17 +11,13 @@ var describe = lab.describe
 var it = lab.it
 var expect = Code.expect
 
-var gex     = require('gex')
-var async   = require('async')
-
-var testopts = { log: 'silent' }
+var testopts = {log: 'silent'}
 
 
-describe('perm acl', function() {
-
+describe('perm acl', function () {
   var si = seneca(testopts)
 
-  si.use( '..', {
+  si.use('..', {
     accessControls: [
       {
         name: 'access to foobar entities',
@@ -45,10 +41,10 @@ describe('perm acl', function() {
         control: 'sufficient',
         actions: ['list', 'load'],
         conditions: [{
-            attributes: {
-              'region': 'EMEA'
-            }
+          attributes: {
+            'region': 'EMEA'
           }
+        }
         ]
       }, {
         name: 'write access to foobar NORAM entities',
@@ -61,10 +57,10 @@ describe('perm acl', function() {
         control: 'required',
         actions: ['save_new', 'save_existing'],
         conditions: [{
-            attributes: {
-              'region': 'NORAM'
-            }
+          attributes: {
+            'region': 'NORAM'
           }
+        }
         ]
       }, {
         name: 'access to foobar EMEA entities',
@@ -77,12 +73,12 @@ describe('perm acl', function() {
         control: 'required',
         actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
         conditions: [{
-            attributes: {
-              'region': 'EMEA'
-            }
+          attributes: {
+            'region': 'EMEA'
           }
+        }
         ]
-      },{
+      }, {
         name: 'access to foobar private entities',
         roles: ['private_items'],
         entities: [{
@@ -94,12 +90,12 @@ describe('perm acl', function() {
         control: 'required',
         actions: ['list', 'load'],
         conditions: [{
-            attributes: {
-              'status': 'private'
-            }
+          attributes: {
+            'status': 'private'
           }
+        }
         ]
-      },{
+      }, {
         name: 'item: inherit foobar reference',
         roles: [],
         entities: [{
@@ -117,7 +113,7 @@ describe('perm acl', function() {
             }
           }
         ]
-      },{
+      }, {
         name: 'owner only for todos',
         roles: ['my_todos'],
         entities: [{
@@ -128,22 +124,21 @@ describe('perm acl', function() {
         control: 'required',
         actions: ['save_new', 'save_existing', 'list', 'load', 'remove'],
         conditions: [{
-            attributes: {
-              'owner': '{user.id}'
-            }
+          attributes: {
+            'owner': '{user.id}'
           }
+        }
         ]
       }
     ]
   })
 
-  it('seneca ready', function(done) {
+  it('seneca ready', function (done) {
     si.ready(done)
   })
 
-  it('entity level access', function(done) {
-
-    var psi = si.delegate({perm$:{roles:['foobar']}})
+  it('entity level access', function (done) {
+    var psi = si.delegate({perm$: {roles: ['foobar']}})
 
     var pf1 = psi.make('foobar')
 
@@ -161,15 +156,15 @@ describe('perm acl', function() {
           expect(err).to.not.exist()
 
           done()
-    }) }) })
-
+        })
+      })
+    })
   })
 
-  it('ACL save attributes based access/deny', function(done) {
+  it('ACL save attributes based access/deny', function (done) {
+    var psiNoram = si.delegate({perm$: {roles: ['foobar', 'NORAM_WRITE']}})
 
-    var psiNoram = si.delegate({perm$:{roles:['foobar', 'NORAM_WRITE']}})
-
-    var pf1Noram = psiNoram.make('foobar',{region:'NORAM'})
+    var pf1Noram = psiNoram.make('foobar', {region: 'NORAM'})
 
     pf1Noram.save$(function (err, pf1Noram) {
       expect(err).to.not.exist()
@@ -183,24 +178,25 @@ describe('perm acl', function() {
 
         pf1Noram.save$(function (err, pf1Noram) {
           expect(err).to.not.exist()
-          
+
           var psi = si.delegate({perm$: {roles: ['foobar']}})
           var pf1 = psi.make('foobar', {region: 'NORAM'})
 
           pf1.save$(function (err, empty) {
             expect(err).to.exist() //, 'expected a permission denied error but did not get any')
-            expect(err.code).to.equal('perm/fail/acl') //'expected error code to be ACL related')
+            expect(err.code).to.equal('perm/fail/acl') // 'expected error code to be ACL related')
 
             done()
-    }) }) }) })
-
+          })
+        })
+      })
+    })
   })
 
-  it('attributes based access', function(done) {
+  it('attributes based access', function (done) {
+    var psi = si.delegate({perm$: {roles: ['foobar', 'EMEA']}})
 
-    var psi = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
-
-    var pf1 = psi.make('foobar',{region:'EMEA'})
+    var pf1 = psi.make('foobar', {region: 'EMEA'})
 
     pf1.save$(function (err, pf1) {
       expect(err).to.not.exist()
@@ -216,16 +212,16 @@ describe('perm acl', function() {
           expect(err).to.not.exist()
 
           done()
-    }) }) })
-
+        })
+      })
+    })
   })
 
 
-  it('attribute based rejection', function(done) {
+  it('attribute based rejection', function (done) {
+    var psi = si.delegate({perm$: {roles: ['foobar']}})
 
-    var psi = si.delegate({perm$:{roles:['foobar']}})
-
-    var pf1 = psi.make('foobar',{region:'EMEA'})
+    var pf1 = psi.make('foobar', {region: 'EMEA'})
 
     pf1.save$(function (err, pf1) {
       expect(err).to.exist() // 'expected a permission denied error but did not get any'
@@ -233,15 +229,13 @@ describe('perm acl', function() {
 
       done()
     })
-
   })
 
 
-  it('entity level rejection', function(done) {
+  it('entity level rejection', function (done) {
+    var psi = si.delegate({perm$: {roles: ['EMEA']}})
 
-    var psi = si.delegate({perm$:{roles:['EMEA']}})
-
-    var pf1 = psi.make('foobar',{region:'EMEA'})
+    var pf1 = psi.make('foobar', {region: 'EMEA'})
 
     pf1.save$(function (err, pf1) {
       expect(err).to.exist() // , 'expected ACL error but did not get any'
@@ -252,14 +246,13 @@ describe('perm acl', function() {
   })
 
 
-  it('list filtering', function(done) {
+  it('list filtering', function (done) {
+    var psi = si.delegate({perm$: {roles: []}})
+    var psiPriv = si.delegate({perm$: {roles: ['private_items']}})
 
-    var psi = si.delegate({perm$:{roles:[]}})
-    var psiPriv = si.delegate({perm$:{roles:['private_items']}})
-
-    var pf1 = psi.make('item',{number: 1, status: 'public'})
-    var pf2 = psiPriv.make('item',{number: 2, status: 'private'})
-    var pf3 = psiPriv.make('item',{number: 3, status: 'private'})
+    var pf1 = psi.make('item', {number: 1, status: 'public'})
+    var pf2 = psiPriv.make('item', {number: 2, status: 'private'})
+    var pf3 = psiPriv.make('item', {number: 3, status: 'private'})
 
     pf1.save$(function (err, pf1) {
       expect(err).to.not.exist()
@@ -279,25 +272,27 @@ describe('perm acl', function() {
             expect(publicList).to.have.length(1) // 'permissions should filter out forbidden objects: ' + JSON.stringify(publicList))
 
             pf2.list$(function (err, privateList) {
-
               expect(err).to.not.exist()
               expect(privateList).to.exist()
               expect(privateList).to.have.length(3)
 
               done()
-    }) }) }) }) })
+            })
+          })
+        })
+      })
+    })
   })
 
-  it('context based access', function(done) {
-
+  it('context based access', function (done) {
     var user = {
-      id: 'test_user_'+Date.now()
+      id: 'test_user_' + Date.now()
     }
 
-    var psi = si.delegate({user$: user, perm$:{roles:['my_todos']}})
+    var psi = si.delegate({user$: user, perm$: {roles: ['my_todos']}})
 
-    var pf1 = psi.make('todo',{owner: user.id})
-    var pf2 = psi.make('todo',{owner: 'does not exist'})
+    var pf1 = psi.make('todo', {owner: user.id})
+    var pf2 = psi.make('todo', {owner: 'does not exist'})
 
     pf1.save$(function (err, pf1) {
       expect(err).to.not.exist()
@@ -316,50 +311,52 @@ describe('perm acl', function() {
             expect(err).to.exist()
 
             done()
-    }) }) }) })
-
+          })
+        })
+      })
+    })
   })
 
 
-  it('updating an object runs the ACLs against existing values', function(done) {
+  it('updating an object runs the ACLs against existing values', function (done) {
+    var emeaSeneca = si.delegate({perm$: {roles: ['foobar', 'EMEA']}})
+    var foobarSeneca = si.delegate({perm$: {roles: ['foobar', 'EMEA_READ']}})
+    var foobar2Seneca = si.delegate({perm$: {roles: ['foobar']}})
 
-    var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
-    var foobarSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA_READ']}})
-    var foobar2Seneca = si.delegate({perm$:{roles:['foobar']}})
+    var pf1 = emeaSeneca.make('foobar', {region: 'EMEA'})
 
-    var pf1 = emeaSeneca.make('foobar', {region:'EMEA'})
-
-    pf1.save$(function(err, pf1) {
+    pf1.save$(function (err, pf1) {
       expect(err).to.not.exist() // err ? err.stack : undefined)
       expect(pf1.id).to.exist() // 'creating entity should set an id on the entity'
 
-      var pf11 = foobarSeneca.make('foobar',{id: pf1.id, region: 'APAC'})
+      var pf11 = foobarSeneca.make('foobar', {id: pf1.id, region: 'APAC'})
 
-    pf11.save$(function(err, pf11) {
-      expect(err).to.exist() //  'user should be denied update capability because he can only update EMEA entities'
-      expect(err.code).to.equal('perm/fail/acl') // 'expected error code to be ACL related'
+      pf11.save$(function (err, pf11) {
+        expect(err).to.exist() //  'user should be denied update capability because he can only update EMEA entities'
+        expect(err.code).to.equal('perm/fail/acl') // 'expected error code to be ACL related'
 
-      var pf12 = foobar2Seneca.make('foobar',{id: pf1.id, region: 'APAC'})
+        var pf12 = foobar2Seneca.make('foobar', {id: pf1.id, region: 'APAC'})
 
-    pf12.save$(function(err, pf12) {
-      expect(err).to.exist() // 'user should be denied update capability').
-      expect(err.code).to.equal('perm/fail/acl') //'expected error code to be ACL related'
+        pf12.save$(function (err, pf12) {
+          expect(err).to.exist() // 'user should be denied update capability').
+          expect(err.code).to.equal('perm/fail/acl') // 'expected error code to be ACL related'
 
-      done()
-    }) }) })
+          done()
+        })
+      })
+    })
   })
 
 
-  it('inherit ACLs (read)', function(done) {
+  it('inherit ACLs (read)', function (done) {
+    var emeaSeneca = si.delegate({perm$: {roles: ['foobar', 'EMEA']}})
+    var apacSeneca = si.delegate({perm$: {roles: ['foobar']}})
 
-    var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
-    var apacSeneca = si.delegate({perm$:{roles:['foobar']}})
-
-    var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
+    var emeaFoobar = emeaSeneca.make('foobar', {region: 'EMEA'})
 
     emeaFoobar.save$(function (err, emeaFoobar) {
       expect(err).to.not.exist()
-     expect(emeaFoobar.id).to.exist()
+      expect(emeaFoobar.id).to.exist()
 
       var item = emeaSeneca.make('item', {foobar: emeaFoobar.id, type: 'inherit'})
 
@@ -378,16 +375,18 @@ describe('perm acl', function() {
             expect(err.code).to.equal('perm/fail/acl')
 
             done()
-    }) }) }) })
+          })
+        })
+      })
+    })
   })
 
 
-  it('inherit ACLs (create)', function(done) {
+  it('inherit ACLs (create)', function (done) {
+    var emeaSeneca = si.delegate({perm$: {roles: ['foobar', 'EMEA']}})
+    var apacSeneca = si.delegate({perm$: {roles: ['foobar', 'APAC']}})
 
-    var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
-    var apacSeneca = si.delegate({perm$:{roles:['foobar', 'APAC']}})
-
-    var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
+    var emeaFoobar = emeaSeneca.make('foobar', {region: 'EMEA'})
 
     emeaFoobar.save$(function (err, emeaFoobar) {
       expect(err).to.not.exist()
@@ -406,16 +405,17 @@ describe('perm acl', function() {
           expect(err.code).to.equal('perm/fail/acl')
 
           done()
-    }) }) })
+        })
+      })
+    })
   })
 
 
-  it('inherit ACLs (update)', function(done) {
+  it('inherit ACLs (update)', function (done) {
+    var emeaSeneca = si.delegate({perm$: {roles: ['foobar', 'EMEA']}})
+    var apacSeneca = si.delegate({perm$: {roles: ['foobar', 'APAC']}})
 
-    var emeaSeneca = si.delegate({perm$:{roles:['foobar', 'EMEA']}})
-    var apacSeneca = si.delegate({perm$:{roles:['foobar', 'APAC']}})
-
-    var emeaFoobar = emeaSeneca.make('foobar',{region: 'EMEA'})
+    var emeaFoobar = emeaSeneca.make('foobar', {region: 'EMEA'})
 
     emeaFoobar.save$(function (err, emeaFoobar) {
       expect(err).to.not.exist()
@@ -440,7 +440,9 @@ describe('perm acl', function() {
             expect(err.code).to.equal('perm/fail/acl')
 
             done()
-    }) }) }) })
+          })
+        })
+      })
+    })
   })
-
 })
