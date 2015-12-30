@@ -88,7 +88,7 @@ describe('perm acl', function () {
           expect(pf1.region).to.equal('EMEA')
 
           pf1NoRemove.remove$({id: pf1.id}, function (err, pf1) {
-            expect(err).to.exist() // 'expected access denied error')
+            expect(err, 'expected access denied error').to.exist()
             done()
           })
         })

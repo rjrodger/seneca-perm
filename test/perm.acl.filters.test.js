@@ -57,12 +57,12 @@ describe('perm acl', function () {
 
       pf1.save$(function (err, pf1) {
         expect(err).to.not.exist()
-        expect(pf1.id).to.exist() // 'missing pf1.id'
+        expect(pf1.id, 'missing pf1.id').to.exist()
         expect(pf1.region).to.equal('EMEA')
 
         pf1.load$(pf1.id, function (err, pf1) {
           expect(err).to.not.exist()
-          expect(pf1.id).to.exist() // 'missing pf1.id'
+          expect(pf1.id, 'missing pf1.id').to.exist()
           expect(pf1.region).to.equal('EMEA')
 
           pf1.a = 2
@@ -74,9 +74,9 @@ describe('perm acl', function () {
 
             pf1NoRegion.load$(pf1.id, function (err, pf1NoRegion) {
               expect(err).to.not.exist()
-              expect(pf1NoRegion).to.exist() // 'missing pf1NoRegion'
+              expect(pf1NoRegion, 'missing pf1NoRegion').to.exist()
               expect(pf1NoRegion.id).to.equal(pf1.id)
-              expect(pf1NoRegion.hasOwnProperty('region')).to.be.false() // 'object has a region attr but it should not')
+              expect(pf1NoRegion.hasOwnProperty('region'), 'not to have region').to.be.false()
 
               done()
             })
@@ -97,13 +97,13 @@ describe('perm acl', function () {
         expect(err).to.not.exist()
         expect(pf1).to.exist()
         expect(pf1.id).to.exist()
-        expect(pf1.hasOwnProperty('region')).to.be.false() // 'regionless user should not be able to save a region attr')
+        expect(pf1.hasOwnProperty('region'), 'regionless user should not be able to save a region attr').to.be.false()
 
         pf1Region.load$(pf1.id, function (err, pf1Region) {
           expect(err).to.not.exist()
           expect(pf1).to.exist()
           expect(pf1.id).to.exist()
-          expect(pf1.hasOwnProperty('region')).to.be.false() // 'Expected region attr to be removed')
+          expect(pf1.hasOwnProperty('region'), 'region attribute to be removed').to.be.false()
 
           done()
         })

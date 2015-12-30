@@ -183,8 +183,8 @@ describe('perm acl', function () {
           var pf1 = psi.make('foobar', {region: 'NORAM'})
 
           pf1.save$(function (err, empty) {
-            expect(err).to.exist() //, 'expected a permission denied error but did not get any')
-            expect(err.code).to.equal('perm/fail/acl') // 'expected error code to be ACL related')
+            expect(err, 'permission denied').to.exist()
+            expect(err.code, 'acl related error').to.equal('perm/fail/acl')
 
             done()
           })
@@ -224,8 +224,8 @@ describe('perm acl', function () {
     var pf1 = psi.make('foobar', {region: 'EMEA'})
 
     pf1.save$(function (err, pf1) {
-      expect(err).to.exist() // 'expected a permission denied error but did not get any'
-      expect(err.code).to.equal('perm/fail/acl') // 'expected error code to be ACL related'
+      expect(err, 'permission denied').to.exist()
+      expect(err.code, 'ACL related error').to.equal('perm/fail/acl')
 
       done()
     })
@@ -238,7 +238,7 @@ describe('perm acl', function () {
     var pf1 = psi.make('foobar', {region: 'EMEA'})
 
     pf1.save$(function (err, pf1) {
-      expect(err).to.exist() // , 'expected ACL error but did not get any'
+      expect(err, 'ACL error is thrown').to.exist()
       expect(err.code).to.equal('perm/fail/acl')
 
       done()
@@ -269,7 +269,7 @@ describe('perm acl', function () {
           pf1.list$(function (err, publicList) {
             expect(err).to.not.exist()
             expect(publicList).to.exist()
-            expect(publicList).to.have.length(1) // 'permissions should filter out forbidden objects: ' + JSON.stringify(publicList))
+            expect(publicList, 'permissions should filter out forbidden objects: ' + JSON.stringify(publicList)).to.have.length(1)
 
             pf2.list$(function (err, privateList) {
               expect(err).to.not.exist()
@@ -326,20 +326,20 @@ describe('perm acl', function () {
     var pf1 = emeaSeneca.make('foobar', {region: 'EMEA'})
 
     pf1.save$(function (err, pf1) {
-      expect(err).to.not.exist() // err ? err.stack : undefined)
-      expect(pf1.id).to.exist() // 'creating entity should set an id on the entity'
+      expect(err).to.not.exist()
+      expect(pf1.id, 'creating entity should set an id on the entity').to.exist()
 
       var pf11 = foobarSeneca.make('foobar', {id: pf1.id, region: 'APAC'})
 
       pf11.save$(function (err, pf11) {
-        expect(err).to.exist() //  'user should be denied update capability because he can only update EMEA entities'
-        expect(err.code).to.equal('perm/fail/acl') // 'expected error code to be ACL related'
+        expect(err, 'user should be denied update capability because he can only update EMEA entities').to.exist()
+        expect(err.code, 'error code is ACL related').to.equal('perm/fail/acl')
 
         var pf12 = foobar2Seneca.make('foobar', {id: pf1.id, region: 'APAC'})
 
         pf12.save$(function (err, pf12) {
-          expect(err).to.exist() // 'user should be denied update capability').
-          expect(err.code).to.equal('perm/fail/acl') // 'expected error code to be ACL related'
+          expect(err, 'user should be denied update capability').to.exist()
+          expect(err.code, 'error code is ACL related').to.equal('perm/fail/acl')
 
           done()
         })
@@ -371,7 +371,7 @@ describe('perm acl', function () {
           var deniedItem = apacSeneca.make('item')
 
           deniedItem.load$(item.id, function (err, deniedItem) {
-            expect(err).to.exist() // 'expected read access to be denied by inheritance'
+            expect(err, 'read access to be denied by inheritance').to.exist()
             expect(err.code).to.equal('perm/fail/acl')
 
             done()
@@ -401,7 +401,7 @@ describe('perm acl', function () {
         var deniedItem = apacSeneca.make('item', {foobar: emeaFoobar.id, type: 'inherit'})
 
         deniedItem.save$(function (err, deniedItem) {
-          expect(err).to.exist() // 'expected create capability to be denied'
+          expect(err, 'create capability to be denied').to.exist()
           expect(err.code).to.equal('perm/fail/acl')
 
           done()
@@ -425,18 +425,18 @@ describe('perm acl', function () {
 
       item.save$(function (err, item) {
         expect(err).to.not.exist()
-        expect(item.id).to.exist() // 'missing inheritance emea entity id'
+        expect(item.id, 'inheritance emea entity id').to.exist()
 
         item.caramel = true
 
         item.save$(function (err, item) {
           expect(err).to.not.exist()
-          expect(item.id).to.exist() // 'missing EMEA entity id on update'
+          expect(item.id, 'EMEA entity id on update').to.exist()
 
           var deniedItem = apacSeneca.make('item', {id: item.id})
 
           deniedItem.save$(function (err, deniedItem) {
-            expect(err).to.exist() // 'expected update capability to be denied due to inheritance'
+            expect(err, 'updated capability to be denied due to inheritance').to.exist()
             expect(err.code).to.equal('perm/fail/acl')
 
             done()

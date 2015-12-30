@@ -73,7 +73,7 @@ describe('perm acl', function () {
       e.save$(function (err, e) {
         expect(err).to.not.exist()
         expect(e).to.exist()
-        expect(e.happy).to.be.undefined() // 'should not have saved change to happy property') // FIXME
+        expect(e.happy, 'unchanged to happy property').to.be.undefined()
 
         done()
       })
@@ -96,7 +96,7 @@ describe('perm acl', function () {
         pf1NoHappy.load$(pf1.id, function (err, pf1NoHappy) {
           expect(err).to.not.exist()
           expect(pf1NoHappy).to.exist()
-          expect(pf1NoHappy.happy).to.equal(1) // 'should not have saved change to happy property')
+          expect(pf1NoHappy.happy, 'unchanged to happy property').to.equal(1)
 
           console.log('loaded happy entity', pf1NoHappy)
 
@@ -111,8 +111,8 @@ describe('perm acl', function () {
 
             expect(err).to.not.exist()
             expect(pf1NoHappy).to.exist()
-            expect(pf1NoHappy.happy).to.equal(1) // 'should not have saved change to happy property')
-            expect(pf1NoHappy.tacos).to.equal('yum') // 'should have saved new tacos property')
+            expect(pf1NoHappy.happy, 'unchanged to happy property').to.equal(1)
+            expect(pf1NoHappy.tacos, 'saved new tacos property').to.equal('yum')
 
             done()
           })
