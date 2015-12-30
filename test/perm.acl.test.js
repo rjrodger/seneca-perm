@@ -12,10 +12,12 @@ var assert  = require('chai').assert
 var gex     = require('gex')
 var async   = require('async')
 
+var testopts = { log: 'silent' }
+
 
 describe('perm acl', function() {
 
-  var si = seneca()
+  var si = seneca(testopts)
 
   si.use( '..', {
     accessControls: [

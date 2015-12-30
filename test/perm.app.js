@@ -2,8 +2,6 @@
 "use strict";
 
 
-
-
 var seneca  = require('seneca')()
 
 var connect = require('connect')

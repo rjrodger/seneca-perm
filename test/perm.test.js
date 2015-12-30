@@ -12,12 +12,13 @@ var assert  = require('chai').assert
 var gex     = require('gex')
 var async   = require('async')
 
+var testopts = { log: 'silent' }
+
 
 describe('perm', function() {
 
-
   it('allow', function(fin){
-    var si = seneca()
+    var si = seneca(testopts)
 
     si.add({a:1,b:2},function(args,done){done(null,''+args.a+args.b+args.c)})
 
@@ -70,7 +71,7 @@ describe('perm', function() {
 
 
   it('entity', function(fin){
-    var si = seneca()
+    var si = seneca(testopts)
 
     si.use( '..', {
       entity:[
@@ -80,7 +81,7 @@ describe('perm', function() {
     })
 
 
-    si.ready(function(){
+    si.ready(function(testopts){
 
       var entity = si.util.router()
       entity.add({name:'foo'},'cr')
@@ -128,7 +129,7 @@ describe('perm', function() {
 
 
   it('entity-boolean', function(fin){
-    var si = seneca()
+    var si = seneca(testopts)
 
     si.use( '..', {
       // apply perm check to all entities
@@ -169,7 +170,7 @@ describe('perm', function() {
 
 
   it('owner', function(fin){
-    var si = seneca()
+    var si = seneca(testopts)
 
     si.use( '..', {
       own:[
@@ -215,7 +216,7 @@ describe('perm', function() {
 
 
   it('makeperm',function(fin){
-    var si = seneca()
+    var si = seneca(testopts)
 
     si.use( '..', {
       act:[
