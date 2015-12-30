@@ -1,13 +1,15 @@
 /* Copyright (c) 2013-2014 Richard Rodger */
 "use strict";
 
-
-// mocha perm.test.js
-
-
 var seneca  = require('seneca')
 
-var assert  = require('chai').assert
+var Lab = require('lab')
+var Code = require('code')
+
+var lab = exports.lab = Lab.script()
+var describe = lab.describe
+var it = lab.it
+var expect = Code.expect
 
 var gex     = require('gex')
 var async   = require('async')
@@ -65,14 +67,14 @@ describe('perm acl', function() {
     var emailItem1 = psi.make('email',{id: 'item1', name: 'Item 1', number: 1, status: 'private'})
     var emailItem2 = psiList.make('email')
 
-    ;emailItem1.save$(function(err,emailItem1){
-      assert.isNull(err, err)
-      assert.isNotNull(emailItem1.id)
+    emailItem1.save$(function(err,emailItem1){
+      expect(err).to.not.exist()
+      expect(emailItem1).to.have
       
       ;emailItem2.list$(function(err, publicList) {
-        assert.isNull(err, err)
-        assert.isNotNull(publicList)
-        assert.equal(publicList.length,0)
+        expect(err).to.not.exist()
+        expect(publicList).to.exist()
+        expect(publicList).to.be.empty()
 
         done()
       }) 
@@ -92,18 +94,20 @@ describe('perm acl', function() {
     var listItem1 = psi.make('list_item',{id: 'item1', name: 'Item 1', number: 1, status: 'private'})
     var listItem2 = psiList.make('list_item')
     
-    ;listItem1.save$(function(err,listItem1){
-      assert.isNull(err, err)
-      assert.isNotNull(listItem1.id)
+    listItem1.save$(function(err,listItem1){
+      expect(err).to.not.exist()
+      expect(listItem1.id).to.exist()
       
-      ;listItem2.list$(function(err, publicList) {
-        assert.isNull(err, err)
-        assert.isNotNull(publicList)
-        assert.equal(publicList[0].hasOwnProperty('name'), true)
-        assert.equal(publicList[0].hasOwnProperty('number'), true)
-        assert.equal(publicList[0].hasOwnProperty('id'), false)
-        assert.equal(publicList[0].hasOwnProperty('status'), false)
-        assert.equal(publicList.length, 1)
+      listItem2.list$(function(err, publicList) {
+        expect(err).to.not.exist()
+        expect(publicList).to.exist()
+        var firstItem = publicList[0]
+        expect(firstItem).to.exist()
+        expect(firstItem.hasOwnProperty('name')).to.be.true()
+        expect(firstItem.hasOwnProperty('number')).to.be.true()
+        expect(firstItem.hasOwnProperty('id')).to.be.false()
+        expect(firstItem.hasOwnProperty('status')).to.be.false()
+        expect(publicList).to.have.length(1)
 
         done()
       }) 

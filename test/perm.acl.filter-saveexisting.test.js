@@ -1,13 +1,14 @@
 /* Copyright (c) 2013-2014 Richard Rodger */
 "use strict";
 
-
-// mocha perm.test.js
-
-
 var seneca  = require('seneca')
+var Lab = require('lab')
+var Code = require('code')
 
-var assert  = require('chai').assert
+var lab = exports.lab = Lab.script()
+var describe = lab.describe
+var it = lab.it
+var expect = Code.expect
 
 var testopts = { log: 'silent' }
 
@@ -70,10 +71,10 @@ describe('perm acl', function() {
 
     var e = psiNoHappy.make('foobar',{a:'a',happy:1})
     
-    e.save$(function(err,e){
-      assert.isNull(err, err)
-      assert.isNotNull(e, 'missing entity')
-      assert.equal(e.happy, undefined,'should not have saved change to happy property') 
+    e.save$(function(err, e){
+      expect(err).to.not.exist()
+      expect(e).to.exist()
+      expect(e.happy).to.be.undefined('should not have saved change to happy property') //FIXME
 
       done();
     })
@@ -88,16 +89,16 @@ describe('perm acl', function() {
     var pf1NoHappy = psiNoHappy.make('foobar',{b:'b',happy:1})
 
     ;pf1.save$(function(err, pf1){
-      assert.isNull(err, err)
+      expect(err).to.not.exist()
       console.log('saved ',pf1);
 
-      assert.isNotNull(pf1.id, 'missing pf1.id')
-      assert.equal(pf1.happy, 1)
+      expect(pf1.id).to.exist()
+      expect(pf1.happy).to.equal(1)
 
     ;pf1NoHappy.load$(pf1.id,function(err, pf1NoHappy) {
-      assert.isNull(err, err)
-      assert.isNotNull(pf1NoHappy, 'missing entity')
-      assert.equal(pf1NoHappy.happy, 1,'should not have saved change to happy property') 
+      expect(err).to.not.exist()
+      expect(pf1NoHappy).to.exist()
+      expect(pf1NoHappy.happy).to.equal(1)// 'should not have saved change to happy property')
 
       console.log('loaded happy entity',pf1NoHappy);
 
@@ -110,10 +111,10 @@ describe('perm acl', function() {
       if(!pf1NoHappy.happy) console.log('happy entity shouldnt be unhappy!',pf1NoHappy);
       else console.log('yay still happy!');
 
-      assert.isNull(err, err)
-      assert.isNotNull(pf1NoHappy, 'missing entity')
-      assert.equal(pf1NoHappy.happy, 1,'should not have saved change to happy property') 
-      assert.equal(pf1NoHappy.tacos, "yum",'should have saved new tacos property')
+      expect(err).to.not.exist()
+      expect(pf1NoHappy).to.exist()
+      expect(pf1NoHappy.happy).to.equal(1)//'should not have saved change to happy property')
+      expect(pf1NoHappy.tacos).to.equal("yum")//'should have saved new tacos property')
 
 
       done()

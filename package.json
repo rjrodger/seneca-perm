@@ -4,8 +4,9 @@
   "description": "Seneca permissions plugin",
   "main": "perm.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test/*.test.js --reporter spec",
-    "cover": "istanbul report text-summary lcov ; cat coverage/lcov.info | coveralls"
+    "cov": "lab -s -P test -r lcov | coveralls",
+    "test": "lab -v -P test -L -t 80",
+    "lint": "lab -P test -dL"
   },
   "repository": {
     "type": "git",
@@ -22,10 +23,12 @@
   "devDependencies": {
     "async": "1.5.x",
     "chai": "3.4.x",
+    "code": "^1.5.0",
     "connect": "3.4.x",
     "coveralls": "^2.11.6",
     "gex": "0.2.x",
     "istanbul": "^0.4.1",
+    "lab": "^6.2.0",
     "mocha": "2.3.x",
     "seneca": "plugin"
   },

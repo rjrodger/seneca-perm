@@ -1,13 +1,15 @@
 /* Copyright (c) 2013-2014 Richard Rodger */
 "use strict";
 
-
-// mocha perm.test.js
-
-
 var seneca  = require('seneca')
 
-var assert  = require('chai').assert
+var Lab = require('lab')
+var Code = require('code')
+
+var lab = exports.lab = Lab.script()
+var describe = lab.describe
+var it = lab.it
+var expect = Code.expect
 
 var gex     = require('gex')
 var async   = require('async')
@@ -53,23 +55,23 @@ describe('perm acl', function() {
 
     var pf1 = psi.make('foobar',{region:'EMEA'})
 
-    ;pf1.save$(function(err, pf1){
-      assert.isNull(err, err)
-      assert.isNotNull(pf1.id, 'missing pf1.id')
-      assert.equal(pf1.region, 'EMEA')
+    pf1.save$(function(err, pf1){
+      expect(err).to.not.exist()
+      expect(pf1.id).to.exist()
+      expect(pf1.region).to.equal('EMEA')
 
-    ;pf1.load$(pf1.id, function(err, pf1){
-      assert.isNull(err, err)
-      assert.isNotNull(pf1.id, 'missing pf1.id')
-      assert.equal(pf1.region, 'EMEA')
+      pf1.load$(pf1.id, function(err, pf1){
+        expect(err).to.not.exist()
+        expect(pf1.id).to.exist()
+        expect(pf1.region).to.equal('EMEA')
 
-    ;pf1.remove$({ id: pf1.id }, function(err, pf1){
-      assert.isNull(err, err)
-      assert.isNotNull(pf1.id, 'missing pf1.id')
-      assert.equal(pf1.region, 'EMEA')
-      done()
-
-    }) }) })
+        pf1.remove$({ id: pf1.id }, function(err, pf1){
+          expect(err).to.not.exist()
+          expect(pf1.id).to.exist()
+          expect(pf1.region).to.equal('EMEA')
+          done()
+    
+        }) }) })
 
   })
 
@@ -81,23 +83,22 @@ describe('perm acl', function() {
     var pf1 = psi.make('foobar',{region:'EMEA'})
     var pf1NoRemove = psiNoRemove.make('foobar')
 
-    ;pf1.save$(function(err, pf1){
-      assert.isNull(err, err)
-      assert.isNotNull(pf1.id, 'missing pf1.id')
-      assert.equal(pf1.region, 'EMEA')
+    pf1.save$(function(err, pf1){
+      expect(err).to.not.exist()
+      expect(pf1.id).to.exist()
+      expect(pf1.region).to.equal('EMEA')
 
-    ;pf1.load$(pf1.id, function(err, pf1){
-      assert.isNull(err, err)
-      assert.isNotNull(pf1.id, 'missing pf1.id')
-      assert.equal(pf1.region, 'EMEA')
+      pf1.load$(pf1.id, function(err, pf1){
+        expect(err).to.not.exist()
+        expect(pf1.id).to.exist()
+        expect(pf1.region).to.equal('EMEA')
 
-    ;pf1NoRemove.remove$({ id: pf1.id }, function(err, pf1){
-      assert.isNotNull(err, 'expected access denied error')
-      done()
-
-    }) }) })
+        pf1NoRemove.remove$({ id: pf1.id }, function(err, pf1){
+          expect(err).to.exist() //'expected access denied error')
+          done()
+    
+        }) }) })
 
   })
-
 
 })
