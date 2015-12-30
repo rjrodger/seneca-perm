@@ -489,7 +489,7 @@ DEBUG=seneca-perm:* node yourapp.js
 [travis-url]: https://travis-ci.org/rjrodger/seneca-perm
 [coveralls-badge]:https://coveralls.io/repos/rjrodger/seneca-perm/badge.svg?branch=master&service=github
 [coveralls-url]: https://coveralls.io/github/rjrodger/seneca-perm?branch=master
-[david-badge]: https://david-dm.org/senecajs/seneca-auth.svg
-[david-url]: https://david-dm.org/senecajs/seneca-auth
-[gitter-badge]: https://badges.gitter.im/senecajs/seneca.png
+[david-badge]: https://david-dm.org/rjrodger/seneca-perm.svg
+[david-url]: https://david-dm.org/rjrodger/seneca-perm
+[gitter-badge]: https://badges.gitter.im/senecajs/seneca.svg
 [gitter-url]: https://gitter.im/senecajs/seneca
