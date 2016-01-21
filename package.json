@@ -4,8 +4,8 @@
   "description": "Seneca permissions plugin",
   "main": "perm.js",
   "scripts": {
-    "cov": "lab -s -P test -r lcov | coveralls",
-    "test": "lab -v -P test -t 80",
+    "coverage": "lab -s -r lcov | coveralls",
+    "test": "lab -v -t 80",
     "lint": "lab -P test -dL"
   },
   "repository": {
