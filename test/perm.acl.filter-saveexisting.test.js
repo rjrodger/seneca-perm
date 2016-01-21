@@ -1,7 +1,7 @@
 /* Copyright (c) 2013-2014 Richard Rodger */
 'use strict'
 
-var seneca = require('seneca')
+var Seneca = require('seneca')
 var Lab = require('lab')
 var Code = require('code')
 
@@ -14,7 +14,7 @@ var testopts = { log: 'silent' }
 
 describe('perm acl', function () {
   describe('filter-save existing', function () {
-    var si = seneca(testopts)
+    var si = Seneca(testopts)
 
     si.use(require('../perm.js'), {
       accessControls: [
