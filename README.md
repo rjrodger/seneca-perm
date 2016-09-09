@@ -139,12 +139,16 @@ app.listen(3000)
 The perm plugin does not wrap other actions immediately when it is registered. Rather, you call the _role:perm, cmd:init_ action
 when you're ready. First you need to add any other plugins and actions that you want to apply permissions checking to.
 
+### Seneca Compatibility
 
+Supports Seneca versions 1.x - 3.x
 
 ## Install
 
 ```sh
 npm install seneca
+npm install seneca-basic
+npm install seneca-entity
 npm install seneca-perm
 ```
 

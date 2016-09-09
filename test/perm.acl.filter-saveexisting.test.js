@@ -15,6 +15,10 @@ describe('perm acl', function() {
 
   var si = seneca()
 
+  si.use('seneca-entity')
+
+  si.use('seneca-basic')
+
   si.use( require('../perm.js'), {
     accessControls: [
       {

@@ -17,6 +17,10 @@ describe('perm acl', function() {
 
   var si = seneca()
 
+  si.use('seneca-entity')
+
+  si.use('seneca-basic')
+
   si.use( '../perm.js', {
     accessControls: [{
       name: 'hard set to true',

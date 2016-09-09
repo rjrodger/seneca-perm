@@ -19,7 +19,11 @@ describe('perm', function() {
   it('allow', function(fin){
     var si = seneca()
 
-    si.add({a:1,b:2},function(args,done){done(null,''+args.a+args.b+args.c)})
+    si.use('seneca-entity')
+
+    si.use('seneca-basic')
+
+    si.add({a:1,b:2},function(args,done){done(null,{msg: ''+args.a+args.b+args.c})})
 
 
     si.use( '..', {act:[
@@ -32,11 +36,11 @@ describe('perm', function() {
 
       ;si.act('a:1,b:2,c:3',function(err,out){
         assert.ok( null == err )
-        assert.equal('123',out)
+        assert.equal('123',out.msg)
 
       ;si.act('a:1,b:2,c:3',{perm$:{allow:true}},function(err,out){
         assert.ok( null == err )
-        assert.equal('123',out)
+        assert.equal('123',out.msg)
 
       ;si.act('a:1,b:2,c:3',{perm$:{allow:false}},function(err,out){
         assert.isNotNull(err)
@@ -44,11 +48,11 @@ describe('perm', function() {
 
       ;si.act('a:1,b:2,c:3,d:4',function(err,out){
         assert.ok( null == err )
-        assert.equal('123',out)
+        assert.equal('123',out.msg)
 
       ;si.act('a:1,b:2,c:3,d:4',{perm$:{allow:true}},function(err,out){
         assert.ok( null == err )
-        assert.equal('123',out)
+        assert.equal('123',out.msg)
 
       ;si.act('a:1,b:2,c:3,d:4',{perm$:{allow:false}},function(err,out){
         assert.isNotNull(err)
@@ -59,7 +63,7 @@ describe('perm', function() {
 
       ;si.act('a:1,b:2,c:3',{perm$:{act:act}},function(err,out){
         assert.ok( null == err )
-        assert.equal('123',out)
+        assert.equal('123',out.msg)
 
         fin();
 
@@ -72,13 +76,16 @@ describe('perm', function() {
   it('entity', function(fin){
     var si = seneca()
 
+    si.use('seneca-entity')
+
+    si.use('seneca-basic')
+
     si.use( '..', {
       entity:[
         {name:'foo'},
         'bar'
       ]
     })
-
 
     si.ready(function(){
 
@@ -130,6 +137,10 @@ describe('perm', function() {
   it('entity-boolean', function(fin){
     var si = seneca()
 
+    si.use('seneca-entity')
+
+    si.use('seneca-basic')
+
     si.use( '..', {
       // apply perm check to all entities
       entity:true
@@ -170,6 +181,10 @@ describe('perm', function() {
 
   it('owner', function(fin){
     var si = seneca()
+
+    si.use('seneca-entity')
+
+    si.use('seneca-basic')
 
     si.use( '..', {
       own:[
@@ -217,6 +232,10 @@ describe('perm', function() {
   it('makeperm',function(fin){
     var si = seneca()
 
+    si.use('seneca-entity')
+
+    si.use('seneca-basic')
+
     si.use( '..', {
       act:[
         {a:1},
@@ -225,8 +244,8 @@ describe('perm', function() {
     })
 
 
-    si.add({a:1},function(args,done){done(null,''+args.a+args.c)})
-    si.add({b:2},function(args,done){done(null,''+args.b+args.c)})
+    si.add({a:1},function(args,done){done(null,{msg:''+args.a+args.c})})
+    si.add({b:2},function(args,done){done(null,{msg:''+args.b+args.c})})
 
 
     si.ready(function(){
@@ -238,11 +257,11 @@ describe('perm', function() {
 
         si.act('a:1,c:3',{perm$:perm},function(err,out){
           assert.ok( null == err )
-          assert.equal('13',out)
+          assert.equal('13',out.msg)
           
           si.act('b:2,c:3',{perm$:perm},function(err,out){
             assert.isNotNull(err)
-            assert.equal('perm/fail/act',err.seneca.code)
+            assert.equal('perm/fail/act',err.code)
 
             fin()
           })
