@@ -17,6 +17,10 @@ describe('perm acl', function() {
 
   var si = seneca()
 
+  si.use('seneca-entity')
+
+  si.use('seneca-basic')
+
   si.use( '..', {
     accessControls: [
       {
@@ -187,7 +191,7 @@ describe('perm acl', function() {
 
     ;pf1.save$(function(err, empty) {
       assert.ok(err, 'expected a permission denied error but did not get any')
-      assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
+      assert.equal(err.orig.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
       done()
     }) }) }) })
@@ -228,7 +232,7 @@ describe('perm acl', function() {
 
     ;pf1.save$(function(err, pf1) {
       assert.ok(err, 'expected a permission denied error but did not get any')
-      assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
+      assert.equal(err.orig.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
       done()
     })
@@ -244,7 +248,7 @@ describe('perm acl', function() {
 
     ;pf1.save$(function(err,pf1){
       assert.isNotNull(err, 'expected ACL error but did not get any')
-      assert.equal(err.code, 'perm/fail/acl')
+      assert.equal(err.orig.code, 'perm/fail/acl')
 
       done()
     })
@@ -338,13 +342,13 @@ describe('perm acl', function() {
 
     ;pf11.save$(function(err, pf11) {
       assert.isNotNull(err, 'user should be denied update capability because he can only update EMEA entities')
-      assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
+      assert.equal(err.orig.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
       var pf12 = foobar2Seneca.make('foobar',{id: pf1.id, region: 'APAC'})
 
     ;pf12.save$(function(err, pf12) {
       assert.isNotNull(err, 'user should be denied update capability')
-      assert.equal(err.code, 'perm/fail/acl', 'expected error code to be ACL related')
+      assert.equal(err.orig.code, 'perm/fail/acl', 'expected error code to be ACL related')
 
       done()
     }) }) })
@@ -376,7 +380,7 @@ describe('perm acl', function() {
 
     ;deniedItem.load$(item.id, function(err,deniedItem){
       assert.isNotNull(err, 'expected read access to be denied by inheritance')
-      assert.equal(err.code, 'perm/fail/acl')
+      assert.equal(err.orig.code, 'perm/fail/acl')
 
       done()
     }) }) }) })
@@ -405,7 +409,7 @@ describe('perm acl', function() {
 
     ;deniedItem.save$(function(err, deniedItem){
       assert.isNotNull(err, 'expected create capability to be denied')
-      assert.equal(err.code, 'perm/fail/acl')
+      assert.equal(err.orig.code, 'perm/fail/acl')
 
       done()
     }) }) })
@@ -439,7 +443,7 @@ describe('perm acl', function() {
 
     ;deniedItem.save$(function(err, deniedItem){
       assert.isNotNull(err, 'expected update capability to be denied due to inheritance')
-      assert.equal(err.code, 'perm/fail/acl')
+      assert.equal(err.orig.code, 'perm/fail/acl')
 
       done()
     }) }) }) })

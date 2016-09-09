@@ -35,8 +35,8 @@ seneca.use('..',{
 seneca.ready(function(){
 
   var b1, b2
-  seneca.make$('bar',{a:1,owner:'o1'}).save$(function(e,o){b1=o})
-  seneca.make$('bar',{a:2,owner:'o2'}).save$(function(e,o){b2=o})
+  seneca.make('bar',{a:1,owner:'o1'}).save$(function(e,o){b1=o})
+  seneca.make('bar',{a:2,owner:'o2'}).save$(function(e,o){b2=o})
 
   var barmap = {
     b1:b1,

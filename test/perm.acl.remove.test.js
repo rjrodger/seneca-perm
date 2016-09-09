@@ -17,6 +17,10 @@ describe('perm acl', function() {
 
   var si = seneca()
 
+  si.use('seneca-entity')
+
+  si.use('seneca-basic')
+
   si.use( '../perm.js', {
     accessControls: [{
       name: 'can delete foobar',
@@ -63,8 +67,7 @@ describe('perm acl', function() {
 
     ;pf1.remove$({ id: pf1.id }, function(err, pf1){
       assert.isNull(err, err)
-      assert.isNotNull(pf1.id, 'missing pf1.id')
-      assert.equal(pf1.region, 'EMEA')
+      assert.isNull(pf1, pf1)
       done()
 
     }) }) })
